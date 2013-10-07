@@ -19,7 +19,10 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 	}
 	
 	public JMenuItem getToolsMenuItem(BPackage aPackage) {
-		return new JMenuItem(new LeJOSFlashAction());
+		JMenuItem jm = new JMenuItem(new LeJOSFlashAction());
+		if( !ext.isConfigruationValid() )
+			jm.setEnabled(false);
+		return jm;
     }
 
 	public JMenuItem getClassMenuItem( final BClass aClass ) {
@@ -44,12 +47,14 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 			jm.addSeparator();
 		}
 
-
 		jm.add(new JMenuItem(new AbstractAction("Compile"){
 					public void actionPerformed( ActionEvent anEvent ) {
 						ext.invokeCompile(aClass);
 					}
 				}));
+		
+		if( !ext.isConfigruationValid() )
+			jm.setEnabled(false);
 		
 		return jm;
 	}

@@ -114,7 +114,8 @@ public abstract class LeJOSDistribution {
 	 * @return A properly configured ProcessBuilder to invoke a new compile
 	 *         process
 	 */
-	public abstract ProcessBuilder invokeCompile( BProject project ) throws ProjectNotOpenException;
+	public abstract ProcessBuilder invokeCompile( BProject project )
+			throws ProjectNotOpenException;
 
 	/**
 	 * Creates a {@link ProcessBuilder} configured to compile the provided
@@ -140,7 +141,8 @@ public abstract class LeJOSDistribution {
 	 * @return A properly configured ProcessBuilder to invoke a new linking
 	 *         process
 	 */
-	public abstract ProcessBuilder invokeLink( BClass main_class ) throws ProjectNotOpenException;
+	public abstract ProcessBuilder invokeLink( BClass main_class )
+			throws ProjectNotOpenException;
 
 	/**
 	 * Creates a {@link ProcessBuilder} configured to upload a nxj binary file
@@ -154,7 +156,8 @@ public abstract class LeJOSDistribution {
 	 * @return A properly configured ProcessBuilder to invoke a new linking
 	 *         process
 	 */
-	public abstract ProcessBuilder invokeUpload( BClass main_class ) throws ProjectNotOpenException;
+	public abstract ProcessBuilder invokeUpload( BClass main_class )
+			throws ProjectNotOpenException;
 
 	/**
 	 * Creates a {@link ProcessBuilder} configured to upload and run a nxj
@@ -168,6 +171,7 @@ public abstract class LeJOSDistribution {
 	 * @return A properly configured ProcessBuilder to invoke a new linking
 	 *         process
 	 */
-	public abstract ProcessBuilder invokeUploadAndRun( BClass main_class ) throws ProjectNotOpenException;
+	public abstract ProcessBuilder invokeUploadAndRun( BClass main_class )
+			throws ProjectNotOpenException;
 
 }

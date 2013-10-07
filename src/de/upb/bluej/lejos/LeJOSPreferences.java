@@ -13,6 +13,9 @@ public class LeJOSPreferences implements PreferenceGenerator {
 	private final String PROPKEY_NXJ_HOME = "NXJ_HOME";
 
 	private final String PROPKEY_LEJOS_VERSION = "LEJOS_VERSION";
+	
+	private final String PROPKEY_WARN_FOR_CONFIG = "WARN_FOR_CONFIG";
+	
 
 
 	private LeJOSExtension main;
@@ -20,7 +23,7 @@ public class LeJOSPreferences implements PreferenceGenerator {
 	private BlueJ bluej;
 
 	private LeJOSPreferencePanel panel;
-
+	
 	public LeJOSPreferences( LeJOSExtension main, BlueJ bluej ) {
 		this.main = main;
 		this.bluej = bluej;
@@ -56,56 +59,60 @@ public class LeJOSPreferences implements PreferenceGenerator {
 		main.setLejosVersion(dist);
 		panel.jcbVersion.setSelectedItem(dist);
 
-		// Verify active Distribution
 		if( !dist.isValid() ) {
-			// TODO: Show information that version is corrupted and introduce a
-			// variable to track if the dist is properly configured
-			JOptionPane
-					.showMessageDialog(
-							panel,
-							"The selected leJOS folder seems to be corrupted." + Character.LINE_SEPARATOR
-							+ "Please select a valid installation for the selected leJOS version ("+dist.getVersion()+").",
-							main.getName() + " Warning",
-							JOptionPane.WARNING_MESSAGE);
+			dist.setDirectory(null);
+			this.showWarningDialog(dist);
+		} else {
+			bluej.setExtensionPropertyString(PROPKEY_WARN_FOR_CONFIG, "true");
 		}
 	}
 
 	@Override
 	public void saveValues() {
-		LeJOSDistribution dist = panel.jcbVersion.getItemAt(panel.jcbVersion.getSelectedIndex());
+		// Read and save NXJ_HOME value
+		File nxjHome = new File(panel.jtfNxjHome.getText().trim());
+		bluej.setExtensionPropertyString(PROPKEY_NXJ_HOME,
+				nxjHome.getAbsolutePath());
+		panel.jtfNxjHome.setText(nxjHome.getAbsolutePath());
+
+		// Read and save leJOS version
+		LeJOSDistribution dist = panel.jcbVersion.getItemAt(panel.jcbVersion
+				.getSelectedIndex());
 		if( dist == null ) {
 			dist = LeJOSDistribution.getLatestLeJOSVersion();
 			panel.jcbVersion.setSelectedItem(dist);
 		}
 		bluej.setExtensionPropertyString(PROPKEY_LEJOS_VERSION,
 				dist.getVersion());
+
+		// Set NXJ_HOME in the distribution and save to extension
+		dist.setDirectory(nxjHome);
 		main.setLejosVersion(dist);
-		System.out.println(main.toString()+" " + PROPKEY_LEJOS_VERSION + "="
-				+ dist.getVersion());
-
-		File nxjHome = new File(panel.jtfNxjHome.getText().trim());
-		if( nxjHome.isDirectory() && dist.isValid(nxjHome) ) {
-			dist.setDirectory(nxjHome);
-			bluej.setExtensionPropertyString(PROPKEY_NXJ_HOME,
-					nxjHome.getAbsolutePath());
-			panel.jtfNxjHome.setText(nxjHome.getAbsolutePath());
-			System.out.println(main.toString()+" " + PROPKEY_NXJ_HOME + "="
-					+ nxjHome);
-		} else {
-			// TODO: set version correct configured to false
+		
+		// Validate configuration
+		bluej.setExtensionPropertyString(PROPKEY_WARN_FOR_CONFIG, "true");
+		if( !dist.isValid() ) {
 			dist.setDirectory(null);
-			bluej.setExtensionPropertyString(PROPKEY_NXJ_HOME, null);
-			panel.jtfNxjHome.setText("");
-			System.out.println(main.toString()+" " + PROPKEY_NXJ_HOME + "=null");
-
-			JOptionPane
-					.showMessageDialog(
-							panel,
-							"The selected leJOS folder seems to be corrupted." + Character.LINE_SEPARATOR
-							+ "Please select a valid installation for the selected leJOS version ("+dist.getVersion()+").",
-							main.getName() + " Warning",
-							JOptionPane.WARNING_MESSAGE);
+			this.showWarningDialog(dist);
 		}
+	}
+	
+	private void showWarningDialog( LeJOSDistribution dist ) {
+		if( bluej.getExtensionPropertyString(PROPKEY_WARN_FOR_CONFIG, "true").equals("false") )
+			return;
+		else
+			bluej.setExtensionPropertyString(PROPKEY_WARN_FOR_CONFIG, "false");
+		
+		JOptionPane
+			.showMessageDialog(
+					this.panel,
+					new String[] {
+							"The selected leJOS folder seems to be corrupted.",
+							"Please select a valid installation for the selected leJOS version ("
+									+ dist.getVersion() + ")."
+					},
+					main.getName() + " Warning",
+					JOptionPane.WARNING_MESSAGE);
 	}
 
 }

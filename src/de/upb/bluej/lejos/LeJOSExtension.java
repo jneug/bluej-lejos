@@ -2,6 +2,8 @@ package de.upb.bluej.lejos;
 
 import java.io.IOException;
 
+import javax.swing.JOptionPane;
+
 import bluej.extensions.BClass;
 import bluej.extensions.BProject;
 import bluej.extensions.BlueJ;
@@ -19,7 +21,7 @@ public class LeJOSExtension extends Extension {
 	private LeJOSDistribution lejos;
 
 	private BlueJ bluej;
-	
+
 	private boolean configuration_valid = false;
 
 	public LeJOSDistribution getLejosVersion() {
@@ -28,8 +30,10 @@ public class LeJOSExtension extends Extension {
 
 	public void setLejosVersion( LeJOSDistribution lejos ) {
 		this.lejos = lejos;
+
+		this.configuration_valid = lejos.isValid();
 	}
-	
+
 	public boolean isConfigruationValid() {
 		return this.configuration_valid;
 	}
@@ -40,7 +44,7 @@ public class LeJOSExtension extends Extension {
 
 		preferences = new LeJOSPreferences(this, bluej);
 		bluej.setPreferenceGenerator(preferences);
-		
+
 		menu = new LeJOSMenuGenerator(this);
 		bluej.setMenuGenerator(menu);
 
@@ -67,22 +71,27 @@ public class LeJOSExtension extends Extension {
 	public String getDescription() {
 		return "leJOS integration for BlueJ";
 	}
-	
+
 	public String toString() {
-		return "["+getName()+" ("+lejos.getVersion()+")]";
+		return "[" + getName() + " (" + lejos.getVersion() + ")]";
 	}
 
 	private void runProcess( ProcessBuilder pb ) {
+		if( !isConfigruationValid() ) {
+			return;
+		}
+
 		try {
-			System.out.println(toString()+" attempting to run " + pb.command().toString());
-			
+			System.out.println(toString() + " attempting to run "
+					+ pb.command().toString());
+
 			pb.inheritIO();
 			Process process = pb.start();
 //			process.waitFor();
 		} catch( IOException ex ) {
-			System.out.println(toString()+" Failed to run command: "
+			System.out.println(toString() + " Failed to run command: "
 					+ pb.command().toString());
-			System.out.println(toString()+" " + ex.getMessage());
+			System.out.println(toString() + " " + ex.getMessage());
 		}
 	}
 
@@ -91,9 +100,8 @@ public class LeJOSExtension extends Extension {
 	}
 
 	public void invokeCompile( BClass clazz ) {
-		System.out.println(toString()+" compiling: " + clazz.getName());
 		// TODO: Allow compilation of single classes (with dependencies)
-		//runProcess(lejos.invokeCompile(new BClass[] { clazz }));
+		// runProcess(lejos.invokeCompile(new BClass[] { clazz }));
 		try {
 			BProject project = clazz.getPackage().getProject();
 			runProcess(lejos.invokeCompile(project));
@@ -102,16 +110,15 @@ public class LeJOSExtension extends Extension {
 	}
 
 	public void invokeLink( BClass main_class ) {
-		System.out.println(toString()+" linking: " + main_class.getName());
 		try {
 			if( !main_class.isCompiled() )
 				invokeCompile(main_class);
 
 			runProcess(lejos.invokeLink(main_class));
 		} catch( ProjectNotOpenException | PackageNotFoundException ex ) {
-			System.out.println(toString()+" Can't link class: "
+			System.out.println(toString() + " Can't link class: "
 					+ main_class.getName());
-			System.out.println(toString()+" " + ex.getMessage());
+			System.out.println(toString() + " " + ex.getMessage());
 		}
 	}
 
@@ -122,9 +129,9 @@ public class LeJOSExtension extends Extension {
 
 			runProcess(lejos.invokeUpload(main_class));
 		} catch( ProjectNotOpenException | PackageNotFoundException ex ) {
-			System.err.println(toString()+" Can't upload class: "
+			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
-			System.err.println(toString()+" " + ex.getMessage());
+			System.err.println(toString() + " " + ex.getMessage());
 		}
 	}
 
@@ -135,9 +142,9 @@ public class LeJOSExtension extends Extension {
 
 			runProcess(lejos.invokeUploadAndRun(main_class));
 		} catch( ProjectNotOpenException | PackageNotFoundException ex ) {
-			System.err.println(toString()+" Can't upload class: "
+			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
-			System.err.println(toString()+" " + ex.getMessage());
+			System.err.println(toString() + " " + ex.getMessage());
 		}
 	}
 
