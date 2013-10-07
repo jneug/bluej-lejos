@@ -98,7 +98,7 @@ public class LeJOSPreferences implements PreferenceGenerator {
 	}
 	
 	private void showWarningDialog( LeJOSDistribution dist ) {
-		if( bluej.getExtensionPropertyString(PROPKEY_WARN_FOR_CONFIG, "true").equals("false") )
+		if( bluej.getExtensionPropertyString(PROPKEY_WARN_FOR_CONFIG, "false").equals("false") )
 			return;
 		else
 			bluej.setExtensionPropertyString(PROPKEY_WARN_FOR_CONFIG, "false");
