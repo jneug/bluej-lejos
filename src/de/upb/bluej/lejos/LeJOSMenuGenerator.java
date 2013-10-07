@@ -19,10 +19,7 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 	}
 	
 	public JMenuItem getToolsMenuItem(BPackage aPackage) {
-		JMenuItem jm = new JMenuItem(new LeJOSFlashAction());
-		if( !ext.isConfigruationValid() )
-			jm.setEnabled(false);
-		return jm;
+		return new JMenuItem(new LeJOSFlashAction());
     }
 
 	public JMenuItem getClassMenuItem( final BClass aClass ) {

@@ -5,6 +5,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import bluej.extensions.BClass;
@@ -29,12 +30,22 @@ public class LeJOS092 extends LeJOSDistribution {
 			"lib/pc/jtools.jar",
 			"lib/pc/3rdparty/bcel.jar",
 			"lib/pc/3rdparty/bluecove.jar",
-			"lib/pc/3rdparty/bluecove-gpl.jar",
 			"lib/pc/3rdparty/commons-cli.jar",
+			"lib/pc/3rdparty/bluecove-gpl.jar"
 	};
 
 	public LeJOS092() {
 		super("0.92beta");
+		
+		if( !LeJOSUtils.IS_UNIX ) {
+			this.pcclasspath = Arrays.copyOf(pcclasspath, pcclasspath.length-1);
+		}
+	}
+	
+	public File[] getNxtClasspathFiles() {
+		return new File[]{
+			new File(directory+File.separator+nxtclasspath[0])
+		};
 	}
 
 	@Override

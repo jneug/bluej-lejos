@@ -87,6 +87,7 @@ public class LeJOSPreferences implements PreferenceGenerator {
 
 		// Set NXJ_HOME in the distribution and save to extension
 		dist.setDirectory(nxjHome);
+		boolean showReminder = !main.getLejosVersion().getVersion().equals(dist.getVersion());
 		main.setLejosVersion(dist);
 		
 		// Validate configuration
@@ -94,7 +95,23 @@ public class LeJOSPreferences implements PreferenceGenerator {
 		if( !dist.isValid() ) {
 			dist.setDirectory(null);
 			this.showWarningDialog(dist);
+		} else if( showReminder ) {
+			showClasspathReminder(dist);
 		}
+	}
+	
+
+	private void showClasspathReminder( LeJOSDistribution dist ) {
+		JOptionPane
+			.showMessageDialog(
+					this.panel,
+					new String[] {
+							"It seems that you changed your leJOS distribution to " + dist.getVersion() + ".",
+							"Remember to also set the classpath to the correct jar at:",
+							dist.getNxtClasspathFiles()[0].getAbsolutePath()
+					},
+					main.getName() + " Information",
+					JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	private void showWarningDialog( LeJOSDistribution dist ) {

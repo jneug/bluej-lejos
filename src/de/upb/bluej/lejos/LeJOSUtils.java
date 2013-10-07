@@ -8,6 +8,34 @@ import bluej.extensions.ClassNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 
 public class LeJOSUtils {
+	
+	public static final String OS_NAME = getOSName();
+	
+	static String getOSName() {
+		try {
+			String os = System.getProperty("os.name");
+			return (os == null ? "" : os);
+		} catch( SecurityException ex ) {
+			return "";
+		}
+	}
+
+	public static final boolean IS_MAC = isOS("Mac"); 
+	public static final boolean IS_LINUX = isOS("Linux") || isOS("LINUX");
+	public static final boolean IS_WINDOWS = isOS("Windows");
+	public static final boolean IS_UNIX = IS_MAC || IS_LINUX || isOS("AIX","HP-UX","Irix","FreeBSD","OpenBSD","NetBSD","OS/2","Solaris","SunOS");
+	
+	static boolean isOS(final String osNamePrefix) {
+        return OS_NAME.startsWith(osNamePrefix);
+    }
+	
+	static boolean isOS(final String... osNamePrefix) {
+		for( String prefix: osNamePrefix) {
+			if( !isOS(prefix) )
+				return false;
+		}
+        return true;
+    }
 
 	/**
 	 * Checks if the provided class has a main method.

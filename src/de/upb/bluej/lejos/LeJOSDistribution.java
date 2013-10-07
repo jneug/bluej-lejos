@@ -66,6 +66,8 @@ public abstract class LeJOSDistribution {
 	public File getDirectory() {
 		return this.directory;
 	}
+	
+	public abstract File[] getNxtClasspathFiles();
 
 	/**
 	 * Checks if the current {@link #getDirectory() directory} points to a valid
