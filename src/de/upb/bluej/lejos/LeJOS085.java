@@ -16,7 +16,7 @@ import bluej.extensions.ProjectNotOpenException;
 public class LeJOS085 extends LeJOSDistribution {
 
 	private String[] folders = new String[] {
-			"lib", "3rdparty"
+			"lib", "3rdparty", "3rdparty/lib"
 	};
 
 	private String[] nxtclasspath = new String[] {
@@ -26,11 +26,11 @@ public class LeJOS085 extends LeJOSDistribution {
 	private String[] pcclasspath = new String[] {
 			"lib/pccomm.jar",
 			"lib/pctools.jar",
-			"lib/tools.jar",
-			"3rdparty/bcel.jar",
-			"3rdparty/bluecove.jar",
-			"3rdparty/bluecove-gpl.jar",
-			"3rdparty/commons-cli.jar",
+			"lib/jtools.jar",
+			"3rdparty/lib/bcel.jar",
+			"3rdparty/lib/bluecove.jar",
+			"3rdparty/lib/bluecove-gpl.jar",
+			"3rdparty/lib/commons-cli.jar",
 	};
 
 	public LeJOS085() {
@@ -79,8 +79,8 @@ public class LeJOS085 extends LeJOSDistribution {
 		return true;
 	}
 
-//	 "$JAVA" $NXJ_FORCE32 -Dnxj.home="$NXJ_HOME" -DCOMMAND_NAME="$NXJ_COMMAND"
-//			 -classpath "$NXJ_CP_PC" lejos.pc.tools.NXJFlashG "$@"
+//	 java -d32 -Dnxj.home="$NXJ_HOME" -DCOMMAND_NAME="$NXJ_COMMAND" -Djava.library.path="$NXJ_BIN" 
+//			-classpath "$NXJ_CP_TOOL" lejos.pc.tools.NXJFlashG  "$@"
 	@Override
 	public ProcessBuilder invokeFlash() {
 		assert directory != null;
@@ -102,7 +102,7 @@ public class LeJOS085 extends LeJOSDistribution {
 		return builder;
 	}
 
-	// "$JAVAC" -bootclasspath "$NXJ_CP_NXT" -extdirs "" "$@"
+	// javac -bootclasspath "$NXJ_CP_BOOT" "$@"
 	@Override
 	public ProcessBuilder invokeCompile( BProject project )
 			throws ProjectNotOpenException {
@@ -138,7 +138,7 @@ public class LeJOS085 extends LeJOSDistribution {
 		return builder;
 	}
 
-	// "$JAVAC" -bootclasspath "$NXJ_CP_NXT" -extdirs "" "$@"
+	// javac -bootclasspath "$NXJ_CP_BOOT" "$@"
 	@Override
 	public ProcessBuilder invokeCompile( BClass[] classes ) {
 		assert directory != null;
@@ -167,9 +167,9 @@ public class LeJOS085 extends LeJOSDistribution {
 	}
 
 
-//	 "$JAVA" $NXJ_FORCE32 -Dnxj.home="$NXJ_HOME" -DCOMMAND_NAME="$NXJ_COMMAND"
-//			 -classpath "$NXJ_CP_PC" lejos.pc.tools.NXJLink --bootclasspath "$NXJ_CP_NXT"
-//			 --writeorder "LE" --classpath "." "$@"
+//	 java -d32 -Dnxj.home="$NXJ_HOME" -DCOMMAND_NAME="$NXJ_COMMAND" -Djava.library.path="$NXJ_BIN" 
+//			-classpath "$NXJ_CP_TOOL" js.tinyvm.TinyVM --bootclasspath "$NXJ_CP_BOOT" 
+//			--writeorder "LE" --classpath "." "$@"
 //	usage: java lejos.pc.tools.NXJLink [options] main-class [more classes]
 //			options:
 //			-a,--all                          do not filter classes
@@ -200,7 +200,7 @@ public class LeJOS085 extends LeJOSDistribution {
 		cmd.add("-classpath");
 		cmd.add(LeJOSUtils.buildClasspath(directory, pcclasspath));
 
-		cmd.add("lejos.pc.tools.NXJLink");
+		cmd.add("js.tinyvm.TinyVM");
 
 		cmd.add("--bootclasspath");
 		cmd.add(LeJOSUtils.buildClasspath(directory, nxtclasspath));
@@ -211,8 +211,6 @@ public class LeJOS085 extends LeJOSDistribution {
 
 		cmd.add("--output");
 		cmd.add("\"" + main_class.getName() + ".nxj\"");
-		cmd.add("--outputdebug");
-		cmd.add("\"" + main_class.getName() + ".dbg\"");
 
 		cmd.add(main_class.getName());
 
@@ -230,8 +228,8 @@ public class LeJOS085 extends LeJOSDistribution {
 		return builder;
 	}
 
-//	"$JAVA" $NXJ_FORCE32 -Dnxj.home="$NXJ_HOME" -DCOMMAND_NAME="$NXJ_COMMAND" 
-//			-classpath "$NXJ_CP_PC" lejos.pc.tools.NXJUpload  "$@"
+//	java -d32 -Dnxj.home="$NXJ_HOME" -DCOMMAND_NAME="$NXJ_COMMAND" -Djava.library.path="$NXJ_BIN" 
+//			-classpath "$NXJ_CP_TOOL" lejos.pc.tools.NXJUpload  "$@"
 //	usage: java lejos.pc.tools.NXJUpload [options] filename [more filenames]
 //			options:
 //			-b,--bluetooth          use bluetooth
