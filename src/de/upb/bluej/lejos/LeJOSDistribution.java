@@ -14,7 +14,7 @@ import bluej.extensions.ProjectNotOpenException;
 public abstract class LeJOSDistribution {
 
 	private static LeJOSDistribution[] versions = new LeJOSDistribution[] {
-			// new LeJOS085(),
+			new LeJOS085(),
 			new LeJOS092() };
 
 	public static LeJOSDistribution[] getSupportedLeJOSVersions() {
