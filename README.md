@@ -1,4 +1,4 @@
-bluej-lejos
+BlueJ.leJOS
 ===========
 
 BlueJ.leJOS is an extension for the popular [BlueJ](http://www.bluej.org)
@@ -7,7 +7,7 @@ development environment, integrating and connecting the
 to develop Java programs for the NXT brick.
 
 The extension is developed by [Jonas Neugebauer](http://ddi.uni-paderborn.de/personen/jonas-neugebauer.html) and published under the
-[GNU General Public License version 2](LICENSE.txt).
+[GNU General Public License version 2](LICENSE).
 
 Installation
 ============
