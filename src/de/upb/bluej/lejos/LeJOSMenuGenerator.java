@@ -7,11 +7,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import bluej.extensions.BClass;
-import bluej.extensions.BMethod;
 import bluej.extensions.BPackage;
-import bluej.extensions.ClassNotFoundException;
 import bluej.extensions.MenuGenerator;
-import bluej.extensions.ProjectNotOpenException;
 
 public class LeJOSMenuGenerator extends MenuGenerator {
 
@@ -26,7 +23,7 @@ public class LeJOSMenuGenerator extends MenuGenerator {
     }
 
 	public JMenuItem getClassMenuItem( final BClass aClass ) {
-		JMenu jm = new JMenu("leJOS NXJ");
+		JMenu jm = new JMenu(ext.getName());
 
 		if( LeJOSUtils.hasMain(aClass) ) {
 			jm.add(new JMenuItem(new AbstractAction("Run"){

@@ -19,6 +19,8 @@ public class LeJOSExtension extends Extension {
 	private LeJOSDistribution lejos;
 
 	private BlueJ bluej;
+	
+	private boolean configuration_valid = false;
 
 	public LeJOSDistribution getLejosVersion() {
 		return lejos;
@@ -27,6 +29,10 @@ public class LeJOSExtension extends Extension {
 	public void setLejosVersion( LeJOSDistribution lejos ) {
 		this.lejos = lejos;
 	}
+	
+	public boolean isConfigruationValid() {
+		return this.configuration_valid;
+	}
 
 	@Override
 	public void startup( BlueJ bluej ) {
@@ -34,7 +40,7 @@ public class LeJOSExtension extends Extension {
 
 		preferences = new LeJOSPreferences(this, bluej);
 		bluej.setPreferenceGenerator(preferences);
-
+		
 		menu = new LeJOSMenuGenerator(this);
 		bluej.setMenuGenerator(menu);
 
