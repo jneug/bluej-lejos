@@ -93,6 +93,8 @@ public class LeJOSExtension extends Extension {
 
 		ui.getStatusPane().clear();
 		try {
+			//System.out.println(pb.command().toString());
+			
 			// pb.inheritIO();
 			Process process = pb.start();
 			ui.getStatusPane().captureInputStream(process.getErrorStream());
@@ -126,6 +128,9 @@ public class LeJOSExtension extends Extension {
 	public void invokeCompile( BProject project ) {
 		try {
 			runProcess(lejos.invokeCompile(project));
+			
+			if( ui.getStatusPane().getText().isEmpty() )
+				ui.getStatusPane().appendText("Compilation completed.");
 		} catch( ProjectNotOpenException e ) {
 		}
 	}

@@ -94,8 +94,6 @@ public class LeJOSDebug {
 							m_class.group(2));
 					classes.put(no + "", dci);
 				} else if( m_method.matches() ) {
-					System.out.println("Method found: "+line);
-					
 					int no = Integer.parseInt(m_method.group(1));
 					DebugMethodItem dmi = new DebugMethodItem(no,
 							m_method.group(2));
