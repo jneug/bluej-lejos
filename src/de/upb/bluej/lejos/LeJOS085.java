@@ -16,26 +16,29 @@ import bluej.extensions.ProjectNotOpenException;
 
 public class LeJOS085 extends LeJOSDistribution {
 
+	private String lib_dir = "lib"+File.separator;
+	private String party_dir = "3rdparty"+File.separator+"lib"+File.separator;
+	
 	private String[] folders = new String[] {
-			"lib", "3rdparty", "3rdparty/lib"
+			lib_dir, party_dir
 	};
 
 	private String[] nxtclasspath = new String[] {
-			"lib/classes.jar"
+			lib_dir+"classes.jar"
 	};
 
 	private String[] pcclasspath = new String[] {
-			"lib/pccomm.jar",
-			"lib/pctools.jar",
-			"lib/jtools.jar",
-			"3rdparty/lib/bcel.jar",
-			"3rdparty/lib/bluecove.jar",
-			"3rdparty/lib/commons-cli.jar",
-			"3rdparty/lib/bluecove-gpl.jar"
+			lib_dir+"pccomm.jar",
+			lib_dir+"pctools.jar",
+			lib_dir+"jtools.jar",
+			party_dir+"bcel.jar",
+			party_dir+"bluecove.jar",
+			party_dir+"commons-cli.jar",
+			party_dir+"bluecove-gpl.jar"
 	};
 
 	public LeJOS085() {
-		super("0.85beta");
+		super("0.8");
 		
 		if( !LeJOSUtils.IS_UNIX ) {
 			this.pcclasspath = Arrays.copyOf(pcclasspath, pcclasspath.length-1);
@@ -44,7 +47,7 @@ public class LeJOS085 extends LeJOSDistribution {
 	
 	public File[] getNxtClasspathFiles() {
 		return new File[]{
-			new File(directory+File.separator+nxtclasspath[0])
+				directory.toPath().resolve(nxtclasspath[0]).toFile()
 		};
 	}
 
@@ -100,7 +103,8 @@ public class LeJOS085 extends LeJOSDistribution {
 		cmd.add(LeJOSUtils.getJavaHome());
 		if( LeJOSUtils.isForce32() )
 			cmd.add("-d32");
-		cmd.add("-Dnxj.home=\"" + directory.getAbsolutePath() + "\"");
+		if( !LeJOSUtils.IS_WINDOWS )
+			cmd.add("-Dnxj.home=\"" + directory.getAbsolutePath() + "\"");
 		// cmd.add("-DCOMMAND_NAME=\"nxjflashg\"");
 
 		cmd.add("-classpath");
@@ -120,7 +124,7 @@ public class LeJOS085 extends LeJOSDistribution {
 		assert directory != null;
 
 		List<String> cmd = new ArrayList<String>();
-		cmd.add(LeJOSUtils.getJavaHome() + "c");
+		cmd.add(LeJOSUtils.getJavaHome("javac"));
 
 		cmd.add("-bootclasspath");
 		cmd.add(LeJOSUtils.buildClasspath(directory, nxtclasspath));
@@ -151,30 +155,40 @@ public class LeJOS085 extends LeJOSDistribution {
 
 	// javac -bootclasspath "$NXJ_CP_BOOT" "$@"
 	@Override
-	public ProcessBuilder invokeCompile( BClass[] classes ) {
-		assert directory != null;
+	public ProcessBuilder invokeCompile( BClass[] classes )
+		throws ProjectNotOpenException {
+			assert directory != null;
 
-		List<String> cmd = new ArrayList<String>();
-		cmd.add(LeJOSUtils.getJavaHome() + "c");
-
-		cmd.add("-bootclasspath");
-		cmd.add(LeJOSUtils.buildClasspath(directory, nxtclasspath));
-
-		cmd.add("-extdirs");
-		cmd.add("\"\"");
-
-		for( BClass bclass: classes ) {
+			BProject project;
 			try {
-				cmd.add(bclass.getJavaFile().getAbsolutePath());
-			} catch( ProjectNotOpenException | PackageNotFoundException e ) {
-				System.out.println("[leJOS " + getVersion()
-						+ "] error compiling class: " + bclass.getName());
+				project = classes[0].getPackage().getProject();
+			} catch( PackageNotFoundException e ) {
+				return null;
 			}
-		}
+			
+			List<String> cmd = new ArrayList<String>();
+			cmd.add(LeJOSUtils.getJavaHome("javac"));
 
-		ProcessBuilder builder = new ProcessBuilder(cmd);
-//		builder.directory(classes[0].getPackage().getProject().getDir());
-		return builder;
+			cmd.add("-bootclasspath");
+			cmd.add(LeJOSUtils.buildClasspath(directory, nxtclasspath));
+			cmd.add("-classpath");
+			cmd.add(".");
+
+			cmd.add("-extdirs");
+			cmd.add("\"\"");
+
+			for( BClass bclass: classes ) {
+				try {
+					cmd.add(bclass.getJavaFile().getAbsolutePath());
+				} catch( ProjectNotOpenException | PackageNotFoundException e ) {
+					System.out.println("[leJOS " + getVersion()
+							+ "] error compiling class: " + bclass.getName());
+				}
+			}
+
+			ProcessBuilder builder = new ProcessBuilder(cmd);
+			builder.directory(project.getDir());
+			return builder;
 	}
 
 
@@ -205,7 +219,8 @@ public class LeJOS085 extends LeJOSDistribution {
 		cmd.add(LeJOSUtils.getJavaHome());
 		if( LeJOSUtils.isForce32() )
 			cmd.add("-d32");
-		cmd.add("-Dnxj.home=\"" + directory.getAbsolutePath() + "\"");
+		if( !LeJOSUtils.IS_WINDOWS )
+			cmd.add("-Dnxj.home=\"" + directory.getAbsolutePath() + "\"");
 		// cmd.add("-DCOMMAND_NAME=\"nxjlink\"");
 
 		cmd.add("-classpath");
@@ -258,7 +273,8 @@ public class LeJOS085 extends LeJOSDistribution {
 		cmd.add(LeJOSUtils.getJavaHome());
 		if( LeJOSUtils.isForce32() )
 			cmd.add("-d32");
-		cmd.add("-Dnxj.home=\"" + directory.getAbsolutePath() + "\"");
+		if( !LeJOSUtils.IS_WINDOWS )
+			cmd.add("-Dnxj.home=\"" + directory.getAbsolutePath() + "\"");
 		// cmd.add("-DCOMMAND_NAME=\"nxjupload\"");
 
 		cmd.add("-classpath");
@@ -289,7 +305,8 @@ public class LeJOS085 extends LeJOSDistribution {
 		cmd.add(LeJOSUtils.getJavaHome());
 		if( LeJOSUtils.isForce32() )
 			cmd.add("-d32");
-		cmd.add("-Dnxj.home=\"" + directory.getAbsolutePath() + "\"");
+		if( !LeJOSUtils.IS_WINDOWS )
+			cmd.add("-Dnxj.home=\"" + directory.getAbsolutePath() + "\"");
 		// cmd.add("-DCOMMAND_NAME=\"nxjupload\"");
 
 		cmd.add("-classpath");

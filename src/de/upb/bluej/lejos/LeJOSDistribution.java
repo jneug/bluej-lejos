@@ -14,6 +14,7 @@ import bluej.extensions.ProjectNotOpenException;
 public abstract class LeJOSDistribution {
 
 	private static LeJOSDistribution[] versions = new LeJOSDistribution[] {
+			//new LeJOSTest(),
 			new LeJOS085(),
 			new LeJOS092() };
 
@@ -129,7 +130,8 @@ public abstract class LeJOSDistribution {
 	 * @return A properly configured ProcessBuilder to invoke a new compile
 	 *         process
 	 */
-	public abstract ProcessBuilder invokeCompile( BClass[] classes );
+	public abstract ProcessBuilder invokeCompile( BClass[] classes )
+			throws ProjectNotOpenException;
 
 	/**
 	 * Creates a {@link ProcessBuilder} configured to create a nxj binary file
