@@ -118,6 +118,8 @@ public class LeJOS092 extends LeJOSDistribution {
 	public ProcessBuilder invokeCompile( BProject project )
 			throws ProjectNotOpenException {
 		assert directory != null;
+		
+		// see JavaCompiler for better implementations ?
 
 		List<String> cmd = new ArrayList<String>();
 		cmd.add(LeJOSUtils.getJavaHome() + "c");
@@ -227,7 +229,7 @@ public class LeJOS092 extends LeJOSDistribution {
 
 		cmd.add(main_class.getName());
 
-//		cmd.add("--verbose");
+		cmd.add("--verbose");
 
 		ProcessBuilder builder = new ProcessBuilder(cmd);
 		try {

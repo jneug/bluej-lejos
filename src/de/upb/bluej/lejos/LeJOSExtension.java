@@ -2,14 +2,13 @@ package de.upb.bluej.lejos;
 
 import java.io.IOException;
 
-import javax.swing.JOptionPane;
-
 import bluej.extensions.BClass;
 import bluej.extensions.BProject;
 import bluej.extensions.BlueJ;
 import bluej.extensions.Extension;
 import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
+import de.upb.bluej.lejos.ui.LeJOSExtensionUI;
 
 
 public class LeJOSExtension extends Extension {
@@ -20,9 +19,14 @@ public class LeJOSExtension extends Extension {
 
 	private LeJOSDistribution lejos;
 
+	@SuppressWarnings("unused")
 	private BlueJ bluej;
 
 	private boolean configuration_valid = false;
+	
+	private LeJOSExtensionUI ui;
+	
+	private LeJOSDebug debug;
 
 	public LeJOSDistribution getLejosVersion() {
 		return lejos;
@@ -41,13 +45,17 @@ public class LeJOSExtension extends Extension {
 	@Override
 	public void startup( BlueJ bluej ) {
 		this.bluej = bluej;
-
+		
+		this.debug = new LeJOSDebug();
+		this.ui = new LeJOSExtensionUI(this.debug);
+		this.ui.setLocationRelativeTo(bluej.getCurrentFrame());
+		
 		preferences = new LeJOSPreferences(this, bluej);
 		bluej.setPreferenceGenerator(preferences);
 
 		menu = new LeJOSMenuGenerator(this);
 		bluej.setMenuGenerator(menu);
-
+		
 		bluej.setClassTargetPainter(new LeJOSClassTargetPainter(bluej
 				.getClassTargetPainter()));
 	}
@@ -75,23 +83,28 @@ public class LeJOSExtension extends Extension {
 	public String toString() {
 		return "[" + getName() + " (" + lejos.getVersion() + ")]";
 	}
+	
+	public void showExtensionUI() {
+		ui.setVisible(true);
+	}
 
-	private void runProcess( ProcessBuilder pb ) {
+	private Process runProcess( ProcessBuilder pb ) {
 		if( !isConfigruationValid() ) {
-			return;
+			return null;
 		}
 
+		ui.getStatusPane().clear();
+		ui.setVisible(true);
 		try {
-			System.out.println(toString() + " attempting to run "
-					+ pb.command().toString());
-
-			pb.inheritIO();
+			//pb.inheritIO();
 			Process process = pb.start();
-//			process.waitFor();
+			ui.getStatusPane().captureInputStream(process.getErrorStream());
+			return process;
 		} catch( IOException ex ) {
 			System.out.println(toString() + " Failed to run command: "
 					+ pb.command().toString());
 			System.out.println(toString() + " " + ex.getMessage());
+			return null;
 		}
 	}
 
@@ -111,24 +124,29 @@ public class LeJOSExtension extends Extension {
 
 	public void invokeLink( BClass main_class ) {
 		try {
-			if( !main_class.isCompiled() )
-				invokeCompile(main_class);
+			invokeCompile(main_class);
 
-			runProcess(lejos.invokeLink(main_class));
-		} catch( ProjectNotOpenException | PackageNotFoundException ex ) {
+			Process pr = runProcess(lejos.invokeLink(main_class));
+			if( pr != null ) {
+				try {
+					debug.fromInputStream(pr.getInputStream());
+				} catch( IOException ex ) {
+				}
+				//pr.waitFor();
+			}
+		} catch( ProjectNotOpenException ex ) {
 			System.out.println(toString() + " Can't link class: "
 					+ main_class.getName());
 			System.out.println(toString() + " " + ex.getMessage());
-		}
+		} 
 	}
 
 	public void invokeUpload( BClass main_class ) {
 		try {
-			if( !main_class.isCompiled() )
-				invokeLink(main_class);
+			invokeLink(main_class);
 
 			runProcess(lejos.invokeUpload(main_class));
-		} catch( ProjectNotOpenException | PackageNotFoundException ex ) {
+		} catch( ProjectNotOpenException ex ) {
 			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
 			System.err.println(toString() + " " + ex.getMessage());
@@ -137,11 +155,10 @@ public class LeJOSExtension extends Extension {
 
 	public void invokeUploadAndRun( BClass main_class ) {
 		try {
-			if( !main_class.isCompiled() )
-				invokeLink(main_class);
+			invokeLink(main_class);
 
 			runProcess(lejos.invokeUploadAndRun(main_class));
-		} catch( ProjectNotOpenException | PackageNotFoundException ex ) {
+		} catch( ProjectNotOpenException ex ) {
 			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
 			System.err.println(toString() + " " + ex.getMessage());

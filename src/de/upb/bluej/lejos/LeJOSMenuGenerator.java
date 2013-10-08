@@ -18,10 +18,18 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 		this.ext = ext;
 	}
 	
+	@Override
+	public JMenuItem getViewMenuItem( BPackage bPackage ) {
+		return new JMenuItem(new LeJOSViewUIAction());
+	}
+
+	@Override
 	public JMenuItem getToolsMenuItem(BPackage aPackage) {
 		return new JMenuItem(new LeJOSFlashAction());
     }
-
+	
+	@Override
+	@SuppressWarnings("serial")
 	public JMenuItem getClassMenuItem( final BClass aClass ) {
 		JMenu jm = new JMenu(ext.getName());
 
@@ -56,7 +64,18 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 		return jm;
 	}
 
-	// The nested class that instantiates the different (simple) menus.
+	@SuppressWarnings("serial")
+	class LeJOSViewUIAction extends AbstractAction {
+		public LeJOSViewUIAction() {
+			putValue(AbstractAction.NAME, "leJOS Debug");
+		}
+
+		public void actionPerformed( ActionEvent anEvent ) {
+			ext.showExtensionUI();
+		}
+	}
+
+	@SuppressWarnings("serial")
 	class LeJOSFlashAction extends AbstractAction {
 		public LeJOSFlashAction() {
 			putValue(AbstractAction.NAME, "Flash NXT");
