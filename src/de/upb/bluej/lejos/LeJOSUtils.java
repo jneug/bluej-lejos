@@ -1,6 +1,7 @@
 package de.upb.bluej.lejos;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import bluej.extensions.BClass;
 import bluej.extensions.BMethod;
@@ -73,19 +74,26 @@ public class LeJOSUtils {
 	 * @return
 	 */
 	public static String getJavaHome() {
-		String java_home = System.getenv("LEJOS_NXT_JAVA_HOME");
-		if( java_home != null )
-			return java_home + "/bin/java";
+		return getJavaHome("java");
+	}
+	
+	public static String getJavaHome( String cmd ) {
+		String java_home = "";
+		String path = cmd;
 
 		java_home = System.getenv("JAVA_HOME");
 		if( java_home != null )
-			return java_home + "/bin/java";
+			path = Paths.get(java_home, "bin", cmd).toString();
+		
+		java_home = System.getenv("LEJOS_NXT_JAVA_HOME");
+		if( java_home != null )
+			path = Paths.get(java_home, "bin", cmd).toString();
 
 //		java_home = System.getProperty("java.home");
 //		if( java_home != null )
-//			return java_home+"/bin/java";
+//			return Paths.get(java_home, "bin", "java").toString();
 
-		return "java";
+		return path;
 	}
 
 
@@ -130,16 +138,20 @@ public class LeJOSUtils {
 				dir = root.getParentFile().getAbsolutePath() + File.separator;
 		}
 
-		String sep = System.getProperty("path.separator");
-		if( sep == null )
-			sep = ":";
+		String sep = File.pathSeparator;
 
-		String cp = dir + paths[0];
-		for( int i = 1; i < paths.length; i++ ) {
-			cp += sep + dir + paths[i];
+		String cp = "";
+		for( int i = 0; i < paths.length; i++ ) {
+			String new_cp = dir + paths[i];
+//			if( new_cp.indexOf(" ") != -1 )
+//				new_cp = "\""+new_cp+"\"";
+			if( cp.isEmpty() )
+				cp = new_cp;
+			else
+				cp += sep + new_cp;
 		}
 
 		return cp;
 	}
-
+	
 }
