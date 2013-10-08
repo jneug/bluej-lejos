@@ -1,12 +1,16 @@
 package de.upb.bluej.lejos.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -38,7 +42,24 @@ public class LeJOSExtensionUI extends JFrame {
 		this.statusPane.setPreferredSize(new Dimension(600, 120));
 		this.statusPane.setMinimumSize(new Dimension(320, 60));
 		
-		this.jtfSearch = new JTextField();
+		JScrollPane jspScroll = new JScrollPane(this.statusPane);
+		
+		final String searchLabel = "Enter class or method number ...";
+		this.jtfSearch = new JTextField(searchLabel);
+		final Color fg = this.jtfSearch.getForeground();
+		this.jtfSearch.setForeground(Color.GRAY);
+		this.jtfSearch.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost( FocusEvent e ) {
+			}
+			@Override
+			public void focusGained( FocusEvent e ) {
+				if( jtfSearch.getText().equals(searchLabel) ) {
+					jtfSearch.setText("");
+					jtfSearch.setForeground(fg);
+				}
+			}
+		});
 		this.jtfSearch.getDocument().addDocumentListener(
 				new DocumentListener() {
 					@Override
@@ -71,7 +92,7 @@ public class LeJOSExtensionUI extends JFrame {
 		
 		layout.setHorizontalGroup(
 				layout.createParallelGroup()
-					.addComponent(statusPane)
+					.addComponent(jspScroll)
 					.addComponent(jtfSearch)
 					.addGroup(layout.createSequentialGroup()
 							.addComponent(jlClassLabel)
@@ -82,7 +103,7 @@ public class LeJOSExtensionUI extends JFrame {
 				);
 		layout.setVerticalGroup(
 				layout.createSequentialGroup()
-					.addComponent(statusPane)
+					.addComponent(jspScroll)
 					.addComponent(jtfSearch,
 							GroupLayout.PREFERRED_SIZE,
 							GroupLayout.DEFAULT_SIZE,
