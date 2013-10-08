@@ -1,19 +1,12 @@
 package de.upb.bluej.lejos;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
 
 import bluej.extensions.BClass;
 import bluej.extensions.BPackage;
@@ -21,7 +14,7 @@ import bluej.extensions.BProject;
 import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 
-public class LeJOS092 extends LeJOSDistribution {
+public class LeJOS09 extends LeJOSDistribution {
 
 	private String nxt_dir = "lib" + File.separator + "nxt" + File.separator;
 	private String pc_dir = "lib" + File.separator + "pc" + File.separator;
@@ -46,8 +39,8 @@ public class LeJOS092 extends LeJOSDistribution {
 			party_dir + "bluecove-gpl.jar"
 	};
 
-	public LeJOS092() {
-		super("0.9dev");
+	public LeJOS09() {
+		super("0.9");
 
 		if( !LeJOSUtils.IS_UNIX ) {
 			this.pcclasspath = Arrays.copyOf(pcclasspath,
@@ -131,66 +124,43 @@ public class LeJOS092 extends LeJOSDistribution {
 	@Override
 	public ProcessBuilder invokeCompile( BProject project )
 			throws ProjectNotOpenException {
+		assert directory != null;
 
-		List<File> files = new ArrayList<File>();
+		List<String> cmd = new ArrayList<String>();
+		cmd.add(LeJOSUtils.getJavaHome("javac"));
+
+		cmd.add("-bootclasspath");
+		cmd.add(LeJOSUtils.buildClasspath(directory, nxtclasspath));
+
+		cmd.add("-extdirs");
+		cmd.add("\"\"");
+
+		//cmd.add("*.java");
+		// Workaround because "*.java" throws an error ...
 		BPackage[] bpackages = project.getPackages();
+		URI root = project.getDir().toURI();
 		for( BPackage bpackage: bpackages ) {
 			try {
 				BClass[] bclasses = bpackage.getClasses();
 				for( BClass bclass: bclasses ) {
-					files.add(bclass.getJavaFile());
+					URI rel_path = root
+							.relativize(bclass.getJavaFile().toURI());
+					cmd.add(rel_path.getPath());
 				}
 			} catch( PackageNotFoundException ex ) {
 			}
 		}
 
-		List<String> options = new ArrayList<String>();
-		options.add("-bootclasspath");
-		options.add("/Volumes/Hyrrokkin/Projekte/Java/_Libraries/lejos-9.0/lib/nxt/classes.jar");
-		options.add("-extdirs");
-		options.add("\"\"");
-		options.add("-d");
-		options.add(project.getDir().getAbsolutePath());
-
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-
-		StandardJavaFileManager fileManager = compiler.getStandardFileManager(
-				null, null, null);
-		Iterable<? extends JavaFileObject> compilationUnits = fileManager
-				.getJavaFileObjectsFromFiles(files);
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-
-		boolean success = compiler.getTask(null, fileManager, null, options,
-				null,
-				compilationUnits).call();
-
-		if( !success ) {
-			System.err.println("Compile fail!");
-		} else
-			System.out.println("Compile success!");
-
-		for( Diagnostic<? extends JavaFileObject> diagnostic: diagnostics
-				.getDiagnostics() )
-			System.out.format("Error on line %d in %s%n",
-					diagnostic.getLineNumber(),
-					diagnostic.getSource().toString());
-
-		try {
-			fileManager.close();
-		} catch( IOException io ) {
-			io.printStackTrace();
-		}
-
-		return null;
+		ProcessBuilder builder = new ProcessBuilder(cmd);
+		builder.directory(project.getDir());
+		return builder;
 	}
 
+	// "$JAVAC" -bootclasspath "$NXJ_CP_NXT" -extdirs "" "$@"
 	@Override
 	public ProcessBuilder invokeCompile( BClass[] classes )
 			throws ProjectNotOpenException {
-		if( classes.length == 0 ) {
-			return null;
-		}
+		assert directory != null;
 
 		BProject project;
 		try {
@@ -198,56 +168,30 @@ public class LeJOS092 extends LeJOSDistribution {
 		} catch( PackageNotFoundException e ) {
 			return null;
 		}
+		
+		List<String> cmd = new ArrayList<String>();
+		cmd.add(LeJOSUtils.getJavaHome("javac"));
 
-		List<File> files = new ArrayList<File>();
-		try {
-			for( BClass bclass: classes ) {
-				files.add(bclass.getJavaFile());
+		cmd.add("-bootclasspath");
+		cmd.add(LeJOSUtils.buildClasspath(directory, nxtclasspath));
+		cmd.add("-classpath");
+		cmd.add(".");
+
+		cmd.add("-extdirs");
+		cmd.add("\"\"");
+
+		for( BClass bclass: classes ) {
+			try {
+				cmd.add(bclass.getJavaFile().getAbsolutePath());
+			} catch( ProjectNotOpenException | PackageNotFoundException e ) {
+				System.out.println("[leJOS " + getVersion()
+						+ "] error compiling class: " + bclass.getName());
 			}
-		} catch( PackageNotFoundException ex ) {
 		}
 
-		List<String> options = new ArrayList<String>();
-		options.add("-bootclasspath");
-		options.add("/Volumes/Hyrrokkin/Projekte/Java/_Libraries/lejos-9.0/lib/nxt/classes.jar");
-		options.add("-classpath");
-		options.add(project.getDir().getAbsolutePath());
-		options.add("-extdirs");
-		options.add("\"\"");
-		options.add("-d");
-		options.add(project.getDir().getAbsolutePath());
-
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-
-		StandardJavaFileManager fileManager = compiler.getStandardFileManager(
-				null, null, null);
-		Iterable<? extends JavaFileObject> compilationUnits = fileManager
-				.getJavaFileObjectsFromFiles(files);
-
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-
-		boolean success = compiler.getTask(null, fileManager, null, options,
-				null,
-				compilationUnits).call();
-
-		if( !success ) {
-			System.err.println("Compile fail!");
-		} else
-			System.out.println("Compile success!");
-
-		for( Diagnostic<? extends JavaFileObject> diagnostic: diagnostics
-				.getDiagnostics() )
-			System.out.format("Error on line %d in %s%n",
-					diagnostic.getLineNumber(),
-					diagnostic.getSource().toString());
-
-		try {
-			fileManager.close();
-		} catch( IOException io ) {
-			io.printStackTrace();
-		}
-
-		return null;
+		ProcessBuilder builder = new ProcessBuilder(cmd);
+		builder.directory(project.getDir());
+		return builder;
 	}
 
 //	 "$JAVA" $NXJ_FORCE32 -Dnxj.home="$NXJ_HOME" -DCOMMAND_NAME="$NXJ_COMMAND"

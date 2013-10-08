@@ -14,7 +14,7 @@ import bluej.extensions.BProject;
 import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 
-public class LeJOS085 extends LeJOSDistribution {
+public class LeJOS08 extends LeJOSDistribution {
 
 	private String lib_dir = "lib"+File.separator;
 	private String party_dir = "3rdparty"+File.separator+"lib"+File.separator;
@@ -37,7 +37,7 @@ public class LeJOS085 extends LeJOSDistribution {
 			party_dir+"bluecove-gpl.jar"
 	};
 
-	public LeJOS085() {
+	public LeJOS08() {
 		super("0.8");
 		
 		if( !LeJOSUtils.IS_UNIX ) {
