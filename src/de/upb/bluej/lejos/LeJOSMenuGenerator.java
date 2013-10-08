@@ -29,6 +29,11 @@ public class LeJOSMenuGenerator extends MenuGenerator {
     }
 	
 	@Override
+	public JMenuItem getPackageMenuItem(BPackage aPackage) {
+		return new JMenuItem(new LeJOSCompileAction());
+    }
+	
+	@Override
 	@SuppressWarnings("serial")
 	public JMenuItem getClassMenuItem( final BClass aClass ) {
 		JMenu jm = new JMenu(ext.getName());
@@ -83,6 +88,17 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 
 		public void actionPerformed( ActionEvent anEvent ) {
 			ext.invokeFlash();
+		}
+	}
+
+	@SuppressWarnings("serial")
+	class LeJOSCompileAction extends AbstractAction {
+		public LeJOSCompileAction() {
+			putValue(AbstractAction.NAME, "Compile project for NXT");
+		}
+
+		public void actionPerformed( ActionEvent anEvent ) {
+			ext.invokeCompile();
 		}
 	}
 

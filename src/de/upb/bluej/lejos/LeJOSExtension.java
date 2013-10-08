@@ -6,7 +6,6 @@ import bluej.extensions.BClass;
 import bluej.extensions.BProject;
 import bluej.extensions.BlueJ;
 import bluej.extensions.Extension;
-import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 import de.upb.bluej.lejos.ui.LeJOSExtensionUI;
 
@@ -19,13 +18,12 @@ public class LeJOSExtension extends Extension {
 
 	private LeJOSDistribution lejos;
 
-	@SuppressWarnings("unused")
 	private BlueJ bluej;
 
 	private boolean configuration_valid = false;
-	
+
 	private LeJOSExtensionUI ui;
-	
+
 	private LeJOSDebug debug;
 
 	public LeJOSDistribution getLejosVersion() {
@@ -45,17 +43,17 @@ public class LeJOSExtension extends Extension {
 	@Override
 	public void startup( BlueJ bluej ) {
 		this.bluej = bluej;
-		
+
 		this.debug = new LeJOSDebug();
 		this.ui = new LeJOSExtensionUI(this.debug);
 		this.ui.setLocationRelativeTo(bluej.getCurrentFrame());
-		
+
 		preferences = new LeJOSPreferences(this, bluej);
 		bluej.setPreferenceGenerator(preferences);
 
 		menu = new LeJOSMenuGenerator(this);
 		bluej.setMenuGenerator(menu);
-		
+
 		bluej.setClassTargetPainter(new LeJOSClassTargetPainter(bluej
 				.getClassTargetPainter()));
 	}
@@ -72,7 +70,7 @@ public class LeJOSExtension extends Extension {
 
 	@Override
 	public boolean isCompatible() {
-		return (VERSION_MAJOR >= 3);
+		return (VERSION_MAJOR >= 2);
 	}
 
 	@Override
@@ -83,20 +81,19 @@ public class LeJOSExtension extends Extension {
 	public String toString() {
 		return "[" + getName() + " (" + lejos.getVersion() + ")]";
 	}
-	
+
 	public void showExtensionUI() {
 		ui.setVisible(true);
 	}
 
 	private Process runProcess( ProcessBuilder pb ) {
-		if( !isConfigruationValid() ) {
+		if( !isConfigruationValid() || pb == null ) {
 			return null;
 		}
 
 		ui.getStatusPane().clear();
-		ui.setVisible(true);
 		try {
-			//pb.inheritIO();
+			// pb.inheritIO();
 			Process process = pb.start();
 			ui.getStatusPane().captureInputStream(process.getErrorStream());
 			return process;
@@ -112,13 +109,31 @@ public class LeJOSExtension extends Extension {
 		runProcess(this.lejos.invokeFlash());
 	}
 
-	public void invokeCompile( BClass clazz ) {
-		// TODO: Allow compilation of single classes (with dependencies)
-		// runProcess(lejos.invokeCompile(new BClass[] { clazz }));
+	public void invokeCompile() {
+		BProject project = null;
 		try {
-			BProject project = clazz.getPackage().getProject();
+			project = bluej.getCurrentPackage().getProject();
+		} catch( ProjectNotOpenException e ) {
+			BProject[] projects = bluej.getOpenProjects();
+			if( projects.length > 0 )
+				project = projects[0];
+		}
+
+		if( project != null )
+			invokeCompile(project);
+	}
+
+	public void invokeCompile( BProject project ) {
+		try {
 			runProcess(lejos.invokeCompile(project));
-		} catch( ProjectNotOpenException | PackageNotFoundException e ) {
+		} catch( ProjectNotOpenException e ) {
+		}
+	}
+
+	public void invokeCompile( BClass clazz ) {
+		try {
+			runProcess(lejos.invokeCompile(new BClass[] { clazz }));
+		} catch( ProjectNotOpenException e ) {
 		}
 	}
 
@@ -132,13 +147,15 @@ public class LeJOSExtension extends Extension {
 					debug.fromInputStream(pr.getInputStream());
 				} catch( IOException ex ) {
 				}
-				//pr.waitFor();
+				// pr.waitFor();
 			}
+			
+			ui.setVisible(true);
 		} catch( ProjectNotOpenException ex ) {
 			System.out.println(toString() + " Can't link class: "
 					+ main_class.getName());
 			System.out.println(toString() + " " + ex.getMessage());
-		} 
+		}
 	}
 
 	public void invokeUpload( BClass main_class ) {
@@ -146,6 +163,8 @@ public class LeJOSExtension extends Extension {
 			invokeLink(main_class);
 
 			runProcess(lejos.invokeUpload(main_class));
+			
+			ui.setVisible(true);
 		} catch( ProjectNotOpenException ex ) {
 			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
@@ -158,6 +177,8 @@ public class LeJOSExtension extends Extension {
 			invokeLink(main_class);
 
 			runProcess(lejos.invokeUploadAndRun(main_class));
+			
+			ui.setVisible(true);
 		} catch( ProjectNotOpenException ex ) {
 			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
