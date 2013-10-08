@@ -67,12 +67,12 @@ public class LeJOSExtension extends Extension {
 
 	@Override
 	public String getVersion() {
-		return "0.1dev";
+		return "0.1";
 	}
 
 	@Override
 	public boolean isCompatible() {
-		return (VERSION_MAJOR >= 2);
+		return (VERSION_MAJOR >= 3);
 	}
 
 	@Override
