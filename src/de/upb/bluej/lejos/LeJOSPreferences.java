@@ -10,11 +10,14 @@ import bluej.extensions.PreferenceGenerator;
 
 public class LeJOSPreferences implements PreferenceGenerator {
 
-	private final String PROPKEY_NXJ_HOME = "NXJ_HOME";
-
-	private final String PROPKEY_LEJOS_VERSION = "LEJOS_VERSION";
+	public final static String PROPKEY_NXJ_HOME = "NXJ_HOME";
+	public final static String PROPKEY_LEJOS_VERSION = "LEJOS_VERSION";
+	public final static String PROPKEY_SHOW_LINK = "SHOW_LINK";
+	public final static String PROPKEY_SHOW_COMPILE = "SHOW_COMPILE";
+	public final static String PROPKEY_OPEN_EDITOR = "OPEN_EDITOR";
+	public final static String PROPKEY_OPEN_DEBUG = "OPEN_DEBUG";
 	
-	private final String PROPKEY_WARN_FOR_CONFIG = "WARN_FOR_CONFIG";
+	private final static String PROPKEY_WARN_FOR_CONFIG = "WARN_FOR_CONFIG";
 	
 
 
@@ -24,11 +27,15 @@ public class LeJOSPreferences implements PreferenceGenerator {
 
 	private LeJOSPreferencePanel panel;
 	
+	// Preference store
+	public String nxj_home, lejos_version;
+	public boolean show_compile, show_link, open_editor, open_debug;
+	
 	public LeJOSPreferences( LeJOSExtension main, BlueJ bluej ) {
 		this.main = main;
 		this.bluej = bluej;
 
-		this.panel = new LeJOSPreferencePanel();
+		this.panel = new LeJOSPreferencePanel(bluej);
 		loadValues();
 	}
 
@@ -36,12 +43,22 @@ public class LeJOSPreferences implements PreferenceGenerator {
 	public JPanel getPanel() {
 		return this.panel;
 	}
-
+	
 	@Override
 	public void loadValues() {
-		String nxjHome = bluej.getExtensionPropertyString(PROPKEY_NXJ_HOME,
+		show_link = Boolean.parseBoolean(bluej.getExtensionPropertyString(PROPKEY_SHOW_LINK,"false"));
+		panel.jcbShowLink.setSelected(show_link);
+		show_compile = Boolean.parseBoolean(bluej.getExtensionPropertyString(PROPKEY_SHOW_COMPILE,"false"));
+		panel.jcbShowCompile.setSelected(show_compile);
+		open_editor = Boolean.parseBoolean(bluej.getExtensionPropertyString(PROPKEY_OPEN_EDITOR,"false"));
+		panel.jcbOpenEditor.setSelected(open_editor);
+		open_debug = Boolean.parseBoolean(bluej.getExtensionPropertyString(PROPKEY_OPEN_DEBUG,"true"));
+		panel.jcbOpenDebug.setSelected(open_debug);
+		
+		
+		nxj_home = bluej.getExtensionPropertyString(PROPKEY_NXJ_HOME,
 				LeJOSUtils.getNxjHomeEnv());
-		panel.jtfNxjHome.setText(nxjHome);
+		panel.jtfNxjHome.setText(nxj_home);
 
 		LeJOSDistribution defaultDist = LeJOSDistribution
 				.getLatestLeJOSVersion();
@@ -55,7 +72,7 @@ public class LeJOSPreferences implements PreferenceGenerator {
 //			bluej.setExtensionPropertyString(PROPKEY_LEJOS_VERSION, dist.getVersion());
 		}
 
-		dist.setDirectory(new File(nxjHome));
+		dist.setDirectory(new File(nxj_home));
 		main.setLejosVersion(dist);
 		panel.jcbVersion.setSelectedItem(dist);
 
@@ -69,8 +86,19 @@ public class LeJOSPreferences implements PreferenceGenerator {
 
 	@Override
 	public void saveValues() {
+		show_compile = panel.jcbShowCompile.isSelected();
+		bluej.setExtensionPropertyString(PROPKEY_SHOW_COMPILE, Boolean.toString(show_compile));
+		show_link = panel.jcbShowLink.isSelected();
+		bluej.setExtensionPropertyString(PROPKEY_SHOW_LINK, Boolean.toString(show_link));
+		open_editor = panel.jcbOpenEditor.isSelected();
+		bluej.setExtensionPropertyString(PROPKEY_OPEN_EDITOR, Boolean.toString(open_editor));
+		open_debug = panel.jcbOpenDebug.isSelected();
+		bluej.setExtensionPropertyString(PROPKEY_OPEN_DEBUG, Boolean.toString(open_debug));
+		
+		
 		// Read and save NXJ_HOME value
-		File nxjHome = new File(panel.jtfNxjHome.getText().trim());
+		String nxj_home = panel.jtfNxjHome.getText().trim();
+		File nxjHome = new File(nxj_home);
 		bluej.setExtensionPropertyString(PROPKEY_NXJ_HOME,
 				nxjHome.getAbsolutePath());
 		panel.jtfNxjHome.setText(nxjHome.getAbsolutePath());

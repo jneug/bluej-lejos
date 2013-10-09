@@ -8,14 +8,18 @@ import javax.swing.JMenuItem;
 
 import bluej.extensions.BClass;
 import bluej.extensions.BPackage;
+import bluej.extensions.BlueJ;
 import bluej.extensions.MenuGenerator;
 
 public class LeJOSMenuGenerator extends MenuGenerator {
 
 	private final LeJOSExtension ext;
 	
+	private final BlueJ bluej;
+	
 	public LeJOSMenuGenerator(LeJOSExtension ext) {
 		this.ext = ext;
+		this.bluej = ext.getBlueJ();
 	}
 	
 	@Override
@@ -36,34 +40,39 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 	@Override
 	@SuppressWarnings("serial")
 	public JMenuItem getClassMenuItem( final BClass aClass ) {
-		JMenu jm = new JMenu(ext.getName());
+		JMenu jm = new JMenu(String.format(bluej.getLabel("menu.class"), ext.getName()));
 
 		if( LeJOSUtils.hasMain(aClass) ) {
-			jm.add(new JMenuItem(new AbstractAction("Run"){
+			jm.add(new JMenuItem(new AbstractAction(bluej.getLabel("menu.class.run")){
 				public void actionPerformed( ActionEvent anEvent ) {
 					ext.invokeUploadAndRun(aClass);
 				}
 			}));
-			jm.add(new JMenuItem(new AbstractAction("Upload"){
+			jm.add(new JMenuItem(new AbstractAction(bluej.getLabel("menu.class.upload")){
 				public void actionPerformed( ActionEvent anEvent ) {
 					ext.invokeUpload(aClass);
 				}
 			}));
-			jm.add(new JMenuItem(new AbstractAction("Link"){
-				public void actionPerformed( ActionEvent anEvent ) {
-					ext.invokeLink(aClass);
-				}
-			}));
-			jm.addSeparator();
-		}
-
-		jm.add(new JMenuItem(new AbstractAction("Compile"){
+			if( ext.getPreferences().show_link ) {
+				jm.add(new JMenuItem(new AbstractAction(bluej.getLabel("menu.class.link")){
 					public void actionPerformed( ActionEvent anEvent ) {
-						ext.invokeCompile(aClass);
+						ext.invokeLink(aClass);
 					}
 				}));
+			}
+			if( ext.getPreferences().show_compile )
+				jm.addSeparator();
+		}
+
+		if( ext.getPreferences().show_compile ) {
+			jm.add(new JMenuItem(new AbstractAction(bluej.getLabel("menu.class.compile")){
+						public void actionPerformed( ActionEvent anEvent ) {
+							ext.invokeCompile(aClass);
+						}
+					}));
+		}
 		
-		if( !ext.isConfigruationValid() )
+		if( jm.getItemCount() == 0 || !ext.isConfigruationValid() )
 			jm.setEnabled(false);
 		
 		return jm;
@@ -72,7 +81,7 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 	@SuppressWarnings("serial")
 	class LeJOSViewUIAction extends AbstractAction {
 		public LeJOSViewUIAction() {
-			putValue(AbstractAction.NAME, "leJOS Debug");
+			putValue(AbstractAction.NAME, bluej.getLabel("menu.view.showDebug"));
 		}
 
 		public void actionPerformed( ActionEvent anEvent ) {
@@ -83,7 +92,7 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 	@SuppressWarnings("serial")
 	class LeJOSFlashAction extends AbstractAction {
 		public LeJOSFlashAction() {
-			putValue(AbstractAction.NAME, "Flash NXT");
+			putValue(AbstractAction.NAME, bluej.getLabel("menu.tools.flash"));
 		}
 
 		public void actionPerformed( ActionEvent anEvent ) {
@@ -94,7 +103,7 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 	@SuppressWarnings("serial")
 	class LeJOSCompileAction extends AbstractAction {
 		public LeJOSCompileAction() {
-			putValue(AbstractAction.NAME, "Compile project for NXT");
+			putValue(AbstractAction.NAME, bluej.getLabel("menu.pkg.compile"));
 		}
 
 		public void actionPerformed( ActionEvent anEvent ) {

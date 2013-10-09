@@ -1,0 +1,51 @@
+
+# Misc labels
+browse=...
+lejos=leJOS
+descr=leJOS NXJ Integration in BlueJ
+
+# Preferences
+pref.lejos.home=leJOS Ordner
+pref.lejos.version=leJOS Version
+pref.lejos.nxjHome=$NXJ_HOME
+
+pref.showCompile=Kompilieren im Klassenmen\u00fc anzeigen
+pref.showLink=Verlinken im Klassenmen\u00fc anzeigen
+pref.openEditor=Klasseneditor bei Fehlern automatisch \u00f6ffnen
+pref.openDebug=Debug Fenster automatisch \u00f6ffnen
+
+# Menu labels
+menu.class=%s
+menu.class.compile=Kompilieren
+menu.class.link=Verlinken
+menu.class.upload=Auf NXT laden
+menu.class.run=Auf NXT starten
+
+menu.pkg.compile=Projekt mit leJOS kompilieren
+
+menu.tools.flash=NXT flashen
+menu.view.showDebug=NXT Debug Fenster anzeigen
+
+# Debug window
+debug.title=NXT Debug Fenster
+debug.search.placeholder=Geben Sie eine Klassen- oder Methoden-Nummer ein ...
+debug.label.class=Klasse:
+debug.label.method=Methode:
+debug.noClassFound=Keine Klasse mit der Nummer %s gefunden
+debug.noMethodFound=Keine Methode mit der Nummer %s gefunden
+
+# Informations
+info.compile.project=Projekt erfolgreich kompiliert f\u00fcr %s
+info.compile.package=Paket erfolgreich kompiliert f\u00fcr %s
+info.compile.class=Klasse erfolgreich kompiliert f\u00fcr %s
+
+# Exceptions
+exception.pkgNotFound=Paket nicht gefunden
+exception.projectNotOpen=Projekt nicht offen
+
+exception.compile.project=Unbekannter Fehler beim kompilieren des Projektes
+exception.compile.package=Unbekannter Fehler beim kompilieren des Paketes
+exception.compile.class=Unbekannter Fehler beim kompilieren der Klasse
+exception.link=Unbekannter Fehler beim verlinken der Binärdatei
+exception.upload=Unbekannter Fehler beim \u00dcbertragen des Programms
+exception run=Unbekannter Fehler beim \u00dcbertragen des Programms

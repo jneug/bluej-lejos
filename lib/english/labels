@@ -1,0 +1,51 @@
+
+# Misc labels
+browse=...
+lejos=leJOS
+descr=leJOS NXJ integration in BlueJ
+
+# Preferences
+pref.lejos.home=leJOS Folder
+pref.lejos.version=leJOS Version
+pref.lejos.nxjHome=$NXJ_HOME
+
+pref.showCompile=Show compile option for classes
+pref.showLink=Show link option for classes
+pref.openEditor=Open class editor after compilation error
+pref.openDebug=Automatically open debug window
+
+# Menu labels
+menu.class=%s
+menu.class.compile=Compile
+menu.class.link=Link binary
+menu.class.upload=Upload to NXT
+menu.class.run=Upload and run
+
+menu.pkg.compile=Compile project for NXT
+
+menu.tools.flash=Flash NXT
+menu.view.showDebug=Show NXT debug 
+
+# Debug window
+debug.title=NXT Debug window
+debug.search.placeholder=Enter class or method number ...
+debug.label.class=Class:
+debug.label.method=Method:
+debug.noClassFound=No class found for %s
+debug.noMethodFound=No method found for %s
+
+# Informations
+info.compile.project=Project successfully compiled for use with %s
+info.compile.package=Package successfully compiled for use with %s
+info.compile.class=Class successfully compiled for use with %s
+
+# Exceptions
+exception.pkgNotFound=Package not found
+exception.projectNotOpen=Project not open
+
+exception.compile.project=Unknown error while compiling project for %s
+exception.compile.package=Unknown error while compiling class for %s
+exception.compile.class=Unknown error while compiling package for %s 
+exception.link=Unknown error while linking binary for %s
+exception.upload=Unknown error while uploading program to NXT
+exception run=Unknown error while uploading program to NXT

@@ -6,11 +6,14 @@ import java.io.File;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import bluej.extensions.BlueJ;
 
 public class LeJOSPreferencePanel extends JPanel {
 
@@ -20,12 +23,14 @@ public class LeJOSPreferencePanel extends JPanel {
 	public final JTextField jtfNxjHome;
 
 	public final JComboBox<LeJOSDistribution> jcbVersion;
+	
+	public final JCheckBox jcbShowCompile, jcbShowLink, jcbOpenEditor, jcbOpenDebug;
 
-	public LeJOSPreferencePanel() {
-		JLabel jlNxjHome = new JLabel("leJOS Folder");
+	public LeJOSPreferencePanel(BlueJ bluej) {
+		JLabel jlNxjHome = new JLabel(bluej.getLabel("pref.lejos.home"));
 		this.jtfNxjHome = new JTextField(40);
 
-		JButton jbBrowse = new JButton("...");
+		JButton jbBrowse = new JButton(bluej.getLabel("browse"));
 		jbBrowse.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed( ActionEvent e ) {
@@ -49,7 +54,7 @@ public class LeJOSPreferencePanel extends JPanel {
 			}
 		});
 
-		JButton jbGetNxjHome = new JButton("$NXJ_HOME");
+		JButton jbGetNxjHome = new JButton(bluej.getLabel("pref.lejos.nxjHome"));
 		jbGetNxjHome.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed( ActionEvent e ) {
@@ -61,11 +66,17 @@ public class LeJOSPreferencePanel extends JPanel {
 		if( LeJOSUtils.getNxjHomeEnv().isEmpty() )
 			jbGetNxjHome.setEnabled(false);
 
-		JLabel jlVersion = new JLabel("leJOS Version");
+		JLabel jlVersion = new JLabel(bluej.getLabel("pref.lejos.version"));
 		this.jcbVersion = new JComboBox<LeJOSDistribution>(
 				LeJOSDistribution.getSupportedLeJOSVersions());
 		this.jcbVersion.setEditable(false);
 
+		this.jcbShowCompile = new JCheckBox(bluej.getLabel("pref.showCompile"));
+		this.jcbShowLink = new JCheckBox(bluej.getLabel("pref.showLink"));
+		this.jcbOpenEditor = new JCheckBox(bluej.getLabel("pref.openEditor"));
+		this.jcbOpenDebug = new JCheckBox(bluej.getLabel("pref.openDebug"));
+		
+		
 		// Layout the components
 		GroupLayout layout = new GroupLayout(this);
 		this.setLayout(layout);
@@ -87,7 +98,11 @@ public class LeJOSPreferencePanel extends JPanel {
 												Short.MAX_VALUE))
 						.addGroup(layout.createParallelGroup()
 								.addComponent(this.jtfNxjHome)
-								.addComponent(this.jcbVersion))
+								.addComponent(this.jcbVersion)
+								.addComponent(this.jcbShowCompile)
+								.addComponent(this.jcbShowLink)
+								.addComponent(this.jcbOpenEditor)
+								.addComponent(this.jcbOpenDebug))
 						.addComponent(jbBrowse)
 						.addComponent(jbGetNxjHome)
 				);
@@ -105,6 +120,10 @@ public class LeJOSPreferencePanel extends JPanel {
 										GroupLayout.Alignment.BASELINE)
 										.addComponent(jlVersion)
 										.addComponent(this.jcbVersion))
+										.addComponent(this.jcbShowCompile)
+						.addComponent(this.jcbShowLink)
+						.addComponent(this.jcbOpenEditor)
+						.addComponent(this.jcbOpenDebug)
 				);
 	}
 
