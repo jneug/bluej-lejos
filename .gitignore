@@ -4,3 +4,4 @@ bin
 build.xml
 jar/bluej-extension.jardesc
 jar/dropbox.jardesc
+dist.jardesc
