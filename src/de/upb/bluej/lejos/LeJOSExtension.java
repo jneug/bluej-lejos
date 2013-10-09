@@ -18,6 +18,10 @@ import de.upb.bluej.lejos.ui.LeJOSTextPane;
 
 
 public class LeJOSExtension extends Extension {
+	
+	public static final String NAME = "BlueJ.leJOS";
+	public static final String VERSION = "0.2"; 
+	
 
 	private LeJOSPreferences preferences;
 
@@ -77,12 +81,12 @@ public class LeJOSExtension extends Extension {
 
 	@Override
 	public String getName() {
-		return "BlueJ.leJOS";
+		return NAME;
 	}
 
 	@Override
 	public String getVersion() {
-		return "0.1";
+		return VERSION;
 	}
 	
 	public String getLeJOSVersion() {
