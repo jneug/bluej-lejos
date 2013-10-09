@@ -5,7 +5,10 @@ import java.nio.file.Paths;
 
 import bluej.extensions.BClass;
 import bluej.extensions.BMethod;
+import bluej.extensions.BPackage;
+import bluej.extensions.BProject;
 import bluej.extensions.ClassNotFoundException;
+import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 
 public class LeJOSUtils {
@@ -52,6 +55,21 @@ public class LeJOSUtils {
 		} catch( ProjectNotOpenException | ClassNotFoundException e ) {
 			return false;
 		}
+	}
+	
+	public static BClass findClassForJavaFile( File f, BProject bproject ) {
+		try {
+			BPackage[] bpackages = bproject.getPackages();
+			for( BPackage bpackage: bpackages ) {
+				BClass[] bclasses = bpackage.getClasses();
+				for( BClass bclass: bclasses ) {
+					if( bclass.getJavaFile().equals(f) )
+						return bclass;
+				}
+			}
+		} catch( PackageNotFoundException | ProjectNotOpenException ex ) {
+		}
+		return null;
 	}
 
 	/**
@@ -152,6 +170,14 @@ public class LeJOSUtils {
 		}
 
 		return cp;
+	}
+	
+	public static String buildClasspath( File[] files ) {
+		String[] paths = new String[files.length];
+		for( int i = 0; i < files.length; i++ ) {
+			paths[i] = files[i].getAbsolutePath();
+		}
+		return buildClasspath(null, paths);
 	}
 	
 }
