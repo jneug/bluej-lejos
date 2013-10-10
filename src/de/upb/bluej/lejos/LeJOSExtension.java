@@ -2,6 +2,7 @@ package de.upb.bluej.lejos;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -20,7 +21,7 @@ import de.upb.bluej.lejos.ui.LeJOSTextPane;
 public class LeJOSExtension extends Extension {
 	
 	public static final String NAME = "BlueJ.leJOS";
-	public static final String VERSION = "0.2"; 
+	public static final String VERSION = "0.2.1"; 
 	
 
 	private LeJOSPreferences preferences;
@@ -88,6 +89,15 @@ public class LeJOSExtension extends Extension {
 	public String getVersion() {
 		return VERSION;
 	}
+	
+	@Override
+	public URL getURL () {
+        try {
+            return new URL("https://github.com/jneug/bluej-lejos");
+        } catch ( Exception e ) {
+            return null;
+        }
+    }
 	
 	public String getLeJOSVersion() {
 		return this.lejosVersion;

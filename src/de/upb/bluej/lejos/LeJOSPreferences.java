@@ -133,12 +133,8 @@ public class LeJOSPreferences implements PreferenceGenerator {
 		JOptionPane
 			.showMessageDialog(
 					this.panel,
-					new String[] {
-							"It seems that you changed your leJOS distribution to " + dist.getVersion() + ".",
-							"Remember to also set the classpath to the correct jar at:",
-							dist.getNxtClasspathFiles()[0].getAbsolutePath()
-					},
-					main.getName() + " Information",
+					main.getLabel("dialog.info.updateClasspath", dist.getVersion(), dist.getNxtClasspathFiles()[0].getAbsolutePath()),
+					bluej.getLabel("dialog.info.title"),
 					JOptionPane.INFORMATION_MESSAGE);
 	}
 	
@@ -151,12 +147,8 @@ public class LeJOSPreferences implements PreferenceGenerator {
 		JOptionPane
 			.showMessageDialog(
 					this.panel,
-					new String[] {
-							"The selected leJOS folder seems to be corrupted.",
-							"Please select a valid installation for the selected leJOS version ("
-									+ dist.getVersion() + ")."
-					},
-					main.getName() + " Warning",
+					main.getLabel("dialog.info.corruptVersion", dist.getVersion()),
+					bluej.getLabel("dialog.info.title"),
 					JOptionPane.WARNING_MESSAGE);
 	}
 

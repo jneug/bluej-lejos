@@ -39,6 +39,11 @@ info.compile.project=Project successfully compiled for use with %s
 info.compile.package=Package successfully compiled for use with %s
 info.compile.class=Class successfully compiled for use with %s
 
+# Information dialog windows
+dialog.info.title=BlueJ.leJOS information
+dialog.info.updateClasspath=It seems that you changed your leJOS distribution to %s.\u000aRemember to also set the classpath to the correct jar at:\u000a%s
+dialog.info.corruptVersion=The selected leJOS folder seems to be corrupted.\u000aPlease select a valid installation for the selected leJOS version %s.
+
 # Exceptions
 exception.pkgNotFound=Package not found
 exception.projectNotOpen=Project not open

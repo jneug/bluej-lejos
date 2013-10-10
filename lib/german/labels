@@ -39,6 +39,11 @@ info.compile.project=Projekt erfolgreich kompiliert f\u00fcr %s
 info.compile.package=Paket erfolgreich kompiliert f\u00fcr %s
 info.compile.class=Klasse erfolgreich kompiliert f\u00fcr %s
 
+# Information dialog windows
+dialog.info.title=BlueJ.leJOS Information
+dialog.info.updateClasspath=Sie scheinen die leJOS Distribution auf Version %s ge\u00e4ndert zu haben.\u000aDenken Sie daran ggf. auch die benutzte Klassenbibliothek zu \u00e4ndern auf:\u000a%s
+dialog.info.corruptVersion=Der gew\u00e4hlte leJOS Ordner scheint fehlerhaft zu sein.\u000aBitte w\u00e4hlen Sie einen korrekten Ordner f\u00fcr die leJOS Version %s.
+
 # Exceptions
 exception.pkgNotFound=Paket nicht gefunden
 exception.projectNotOpen=Projekt nicht offen
