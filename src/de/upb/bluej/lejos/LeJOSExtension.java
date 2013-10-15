@@ -141,7 +141,9 @@ public class LeJOSExtension extends Extension {
 
 			// pb.inheritIO();
 			Process process = pb.start();
-			ui.getStatusPane().captureInputStream(process.getErrorStream());
+			
+			LeJOSTextPane pane = ui.getStatusPane();
+			pane.captureInputStream(process.getErrorStream(), pane.getStyle(LeJOSTextPane.ERROR_STYLE));
 			return process;
 		} catch( IOException ex ) {
 			System.out.println(toString() + " Failed to run command: "
@@ -180,12 +182,12 @@ public class LeJOSExtension extends Extension {
 			if( !success ) {
 				handleCompilerErrors(compiler);
 			} else {
-				ui.getStatusPane().appendText(getLabel("info.compile.project", lejosVersion));
+				ui.getStatusPane().appendSuccess(getLabel("info.compile.project", lejosVersion));
 			}
 		} catch( Exception ex ) {
 //			ui.getStatusPane().appendText(
 //					"Unknown error while compiling for leJOS "+lejos.getVersion());
-			ui.getStatusPane().appendText(getLabel("exception.compile.project", lejosVersion));
+			ui.getStatusPane().appendError(getLabel("exception.compile.project", lejosVersion));
 		}
 	}
 
@@ -200,10 +202,10 @@ public class LeJOSExtension extends Extension {
 			if( !success ) {
 				handleCompilerErrors(compiler);
 			} else {
-				ui.getStatusPane().appendText(getLabel("info.compile.class", lejosVersion));
+				ui.getStatusPane().appendSuccess(getLabel("info.compile.class", lejosVersion));
 			}
 		} catch( Exception ex ) {
-			ui.getStatusPane().appendText(getLabel("exception.compile.class", lejosVersion));
+			ui.getStatusPane().appendError(getLabel("exception.compile.class", lejosVersion));
 		}
 	}
 
@@ -213,7 +215,7 @@ public class LeJOSExtension extends Extension {
 
 		for( Diagnostic<? extends JavaFileObject> d: compiler
 				.getDiagnostics() ) {
-			status.appendText(d.getKind().toString() + ": "
+			status.appendError(d.getKind().toString() + ": "
 					+ d.getMessage(null));
 		}
 
@@ -254,7 +256,7 @@ public class LeJOSExtension extends Extension {
 				ui.updateLabels();
 			}
 		} catch( ProjectNotOpenException ex ) {
-			ui.getStatusPane().appendText(getLabel("exception.link", lejosVersion));
+			ui.getStatusPane().appendError(getLabel("exception.link", lejosVersion));
 
 			// Log error
 			System.out.println(toString() + " Can't link class: "
@@ -269,7 +271,7 @@ public class LeJOSExtension extends Extension {
 
 			runProcess(lejos.invokeUpload(main_class));
 		} catch( ProjectNotOpenException ex ) {
-			ui.getStatusPane().appendText(getLabel("exception.upload", lejosVersion));
+			ui.getStatusPane().appendError(getLabel("exception.upload", lejosVersion));
 			
 			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
@@ -283,7 +285,7 @@ public class LeJOSExtension extends Extension {
 
 			runProcess(lejos.invokeUploadAndRun(main_class));
 		} catch( ProjectNotOpenException ex ) {
-			ui.getStatusPane().appendText(getLabel("exception.run", lejosVersion));
+			ui.getStatusPane().appendError(getLabel("exception.run", lejosVersion));
 			
 			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
