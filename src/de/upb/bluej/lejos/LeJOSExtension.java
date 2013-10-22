@@ -1,9 +1,9 @@
 package de.upb.bluej.lejos;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
+import javax.swing.SwingUtilities;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
@@ -14,42 +14,87 @@ import bluej.extensions.Extension;
 import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 import bluej.extensions.editor.Editor;
+import de.upb.bluej.lejos.LeJOSProcess.InputStreamListener;
 import de.upb.bluej.lejos.ui.LeJOSExtensionUI;
 import de.upb.bluej.lejos.ui.LeJOSTextPane;
 
-
+/**
+ * Main extension class. Entry point for the BlueJ extension API.
+ * 
+ * @author Jonas Neugebauer <jonas.neugebauer@upb.de>
+ */
 public class LeJOSExtension extends Extension {
-	
+
+	/**
+	 * Extension name
+	 */
 	public static final String NAME = "BlueJ.leJOS";
-	public static final String VERSION = "0.2.1"; 
-	
+
+	/**
+	 * The current version string in the format {@code MAJOR.MINOR.DEV}
+	 */
+	public static final String VERSION = "0.2.2";
+
+
+	private BlueJ bluej;
 
 	private LeJOSPreferences preferences;
 
 	private LeJOSMenuGenerator menu;
 
-	private LeJOSDistribution lejos;
-	
-	private String lejosVersion = "";
-
-	private BlueJ bluej;
-
-	private boolean configuration_valid = false;
-
 	private LeJOSExtensionUI ui;
 
+	/**
+	 * The current leJOS distribution used for compiling and uploading leJOS
+	 * programs.
+	 */
+	private LeJOSDistribution lejos;
+
+	/**
+	 * Stores debug data from the last call to
+	 * {@link LeJOSDistribution#invokeLink(BClass)}.
+	 */
 	private LeJOSDebug debug;
 
+	/**
+	 * Language specific label for the leJOS version.
+	 */
+	private String lejosVersion = "";
+
+	/**
+	 * Result of the last call to {@link LeJOSDistribution#isValid()}.
+	 */
+	private boolean configuration_valid = false;
+
+	/**
+	 * Default C'tor.
+	 */
+	public LeJOSExtension() {
+	}
+
+	/**
+	 * @return The leJOS distribution currently in use.
+	 */
 	public LeJOSDistribution getLejosVersion() {
 		return lejos;
 	}
 
+	/**
+	 * Sets the leJOS distribution to use for compiling and uploading.
+	 * 
+	 * @param lejos
+	 */
 	public void setLejosVersion( LeJOSDistribution lejos ) {
 		this.lejos = lejos;
-		this.lejosVersion = String.format("%s %s", bluej.getLabel("lejos"), lejos.getVersion());
+		this.lejosVersion = String.format("%s %s", bluej.getLabel("lejos"),
+				lejos.getVersion());
 		this.configuration_valid = lejos.isValid();
 	}
 
+	/**
+	 * @return If the current leJOS distribution is valid.
+	 * @see LeJOSDistribution#isValid()
+	 */
 	public boolean isConfigruationValid() {
 		return this.configuration_valid;
 	}
@@ -71,11 +116,17 @@ public class LeJOSExtension extends Extension {
 		bluej.setClassTargetPainter(new LeJOSClassTargetPainter(bluej
 				.getClassTargetPainter()));
 	}
-	
+
+	/**
+	 * @return The BlueJ application class
+	 */
 	public BlueJ getBlueJ() {
 		return this.bluej;
 	}
-	
+
+	/**
+	 * @return The preferences for the extension
+	 */
 	public LeJOSPreferences getPreferences() {
 		return this.preferences;
 	}
@@ -89,16 +140,20 @@ public class LeJOSExtension extends Extension {
 	public String getVersion() {
 		return VERSION;
 	}
-	
+
 	@Override
-	public URL getURL () {
-        try {
-            return new URL("https://github.com/jneug/bluej-lejos");
-        } catch ( Exception e ) {
-            return null;
-        }
-    }
-	
+	public URL getURL() {
+		try {
+			return new URL("https://github.com/jneug/bluej-lejos");
+		} catch( Exception e ) {
+			return null;
+		}
+	}
+
+	/**
+	 * @return A language dependent version string for the current leJOS
+	 *         distribution
+	 */
 	public String getLeJOSVersion() {
 		return this.lejosVersion;
 	}
@@ -113,14 +168,30 @@ public class LeJOSExtension extends Extension {
 		return bluej.getLabel("descr");
 	}
 
+	@Override
 	public String toString() {
 		return "[" + getName() + " (" + lejosVersion + ")]";
 	}
 
+	/**
+	 * Shows the debug window if not already visible.
+	 */
 	public void showExtensionUI() {
 		ui.setVisible(true);
 	}
-	
+
+	/**
+	 * Returns a formated language dependent {@link BlueJ#getLabel(String)
+	 * label}.
+	 * 
+	 * @param key
+	 *            The key to retrieve
+	 * @param args
+	 *            A set of arguments for formatting
+	 * @return The formatted string
+	 * @see String#format(String, Object...)
+	 * @see BlueJ#getLabel(String)
+	 */
 	public String getLabel( String key, Object... args ) {
 		String label = bluej.getLabel(key);
 		if( args.length == 0 )
@@ -129,23 +200,59 @@ public class LeJOSExtension extends Extension {
 			return String.format(label, args);
 	}
 
-	private Process runProcess( ProcessBuilder pb ) {
+	/**
+	 * Runs a process from the current leJOS distribution.
+	 * 
+	 * @param pb
+	 *            The pre-configured {@code ProcessBuilder}
+	 * @return The new process or {@code null} if there was an error
+	 */
+	private LeJOSProcess/* Process */runProcess( ProcessBuilder pb ) {
 		if( !isConfigruationValid() || pb == null ) {
 			return null;
 		}
 
-		ui.getStatusPane().clear();
+		final LeJOSTextPane pane = ui.getStatusPane();
+		pane.clear();
 		ui.setVisible(preferences.open_debug);
 		try {
 			// System.out.println(pb.command().toString());
 
+			LeJOSProcess process = new LeJOSProcess(pb);
+			process.addErrorListener(new InputStreamListener() {
+				@Override
+				public void nextLine( final String line ) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							pane.appendError(line);
+						}
+					});
+				}
+			});
+			process.addOutputListener(new InputStreamListener() {
+				@Override
+				public void nextLine( final String line ) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							pane.appendText(line);
+						}
+					});
+				}
+			});
+			boolean success = process.start();
+
+			if( !success )
+				throw new Exception("doo");
+
 			// pb.inheritIO();
-			Process process = pb.start();
-			
-			LeJOSTextPane pane = ui.getStatusPane();
-			pane.captureInputStream(process.getErrorStream(), pane.getStyle(LeJOSTextPane.ERROR_STYLE));
+			// Process process = pb.start();
+
+			// pane.captureInputStream(process.getErrorStream(),
+			// pane.getStyle(LeJOSTextPane.ERROR_STYLE));
 			return process;
-		} catch( IOException ex ) {
+		} catch( Exception ex ) {
 			System.out.println(toString() + " Failed to run command: "
 					+ pb.command().toString());
 			System.out.println(toString() + " " + ex.getMessage());
@@ -153,10 +260,20 @@ public class LeJOSExtension extends Extension {
 		}
 	}
 
+	/**
+	 * Invokes the flashing process.
+	 * 
+	 * @see {@link LeJOSDistribution#invokeFlash()}
+	 */
 	public void invokeFlash() {
 		runProcess(this.lejos.invokeFlash());
 	}
 
+	/**
+	 * Invokes the compile project process with the currently open project.
+	 * 
+	 * @seek LeJOSDistribution#invokeCompile(BProject)
+	 */
 	public void invokeCompile() {
 		BProject project = null;
 		try {
@@ -172,6 +289,12 @@ public class LeJOSExtension extends Extension {
 			invokeCompile(project);
 	}
 
+	/**
+	 * Invokes the compile process for the provided project.
+	 * 
+	 * @param project
+	 * @see LeJOSDistribution#invokeCompile(BProject)
+	 */
 	public void invokeCompile( BProject project ) {
 		ui.getStatusPane().clear();
 		ui.setVisible(preferences.open_debug);
@@ -182,15 +305,23 @@ public class LeJOSExtension extends Extension {
 			if( !success ) {
 				handleCompilerErrors(compiler);
 			} else {
-				ui.getStatusPane().appendSuccess(getLabel("info.compile.project", lejosVersion));
+				ui.getStatusPane().appendSuccess(
+						getLabel("info.compile.project", lejosVersion));
 			}
 		} catch( Exception ex ) {
 //			ui.getStatusPane().appendText(
 //					"Unknown error while compiling for leJOS "+lejos.getVersion());
-			ui.getStatusPane().appendError(getLabel("exception.compile.project", lejosVersion));
+			ui.getStatusPane().appendError(
+					getLabel("exception.compile.project", lejosVersion));
 		}
 	}
 
+	/**
+	 * Invokes the compile process for the specified class.
+	 * 
+	 * @param clazz
+	 * @see LeJOSDistribution#invokeCompile(BClass[])
+	 */
 	public void invokeCompile( BClass clazz ) {
 		ui.getStatusPane().clear();
 		ui.setVisible(preferences.open_debug);
@@ -202,13 +333,23 @@ public class LeJOSExtension extends Extension {
 			if( !success ) {
 				handleCompilerErrors(compiler);
 			} else {
-				ui.getStatusPane().appendSuccess(getLabel("info.compile.class", lejosVersion));
+				ui.getStatusPane().appendSuccess(
+						getLabel("info.compile.class", lejosVersion));
 			}
 		} catch( Exception ex ) {
-			ui.getStatusPane().appendError(getLabel("exception.compile.class", lejosVersion));
+			ui.getStatusPane().appendError(
+					getLabel("exception.compile.class", lejosVersion));
 		}
 	}
 
+	/**
+	 * Handles any compile errors and warnings produces by a compile process.
+	 * Might open up a class editor at the first error location.
+	 * 
+	 * @param compiler
+	 * @throws ProjectNotOpenException
+	 * @throws PackageNotFoundException
+	 */
 	private void handleCompilerErrors( LeJOSCompiler compiler )
 			throws ProjectNotOpenException, PackageNotFoundException {
 		LeJOSTextPane status = ui.getStatusPane();
@@ -242,21 +383,34 @@ public class LeJOSExtension extends Extension {
 		}
 	}
 
+	/**
+	 * Invokes the link process.
+	 * 
+	 * @param main_class
+	 * @see LeJOSDistribution#invokeLink(BClass)
+	 */
 	public void invokeLink( BClass main_class ) {
 		try {
 			invokeCompile(main_class);
 
-			Process pr = runProcess(lejos.invokeLink(main_class));
-			if( pr != null ) {
-				try {
-					debug.fromInputStream(pr.getInputStream());
-				} catch( IOException ex ) {
+			LeJOSProcess pr = runProcess(lejos.invokeLink(main_class));
+			pr.addOutputListener(new InputStreamListener() {
+				@Override
+				public void nextLine( String line ) {
+					debug.parseLine(line);
 				}
-				// pr.waitFor();
-				ui.updateLabels();
-			}
+			});
+
+//			if( pr != null ) {
+//				try {
+//					debug.fromInputStream(pr.getInputStream());
+//				} catch( IOException ex ) {
+//				}
+//				ui.updateLabels();
+//			}
 		} catch( ProjectNotOpenException ex ) {
-			ui.getStatusPane().appendError(getLabel("exception.link", lejosVersion));
+			ui.getStatusPane().appendError(
+					getLabel("exception.link", lejosVersion));
 
 			// Log error
 			System.out.println(toString() + " Can't link class: "
@@ -265,28 +419,42 @@ public class LeJOSExtension extends Extension {
 		}
 	}
 
+	/**
+	 * Invokes the upload process.
+	 * 
+	 * @param main_class
+	 * @see LeJOSDistribution#invokeUpload(BClass)
+	 */
 	public void invokeUpload( BClass main_class ) {
 		try {
 			invokeLink(main_class);
 
 			runProcess(lejos.invokeUpload(main_class));
 		} catch( ProjectNotOpenException ex ) {
-			ui.getStatusPane().appendError(getLabel("exception.upload", lejosVersion));
-			
+			ui.getStatusPane().appendError(
+					getLabel("exception.upload", lejosVersion));
+
 			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
 			System.err.println(toString() + " " + ex.getMessage());
 		}
 	}
 
+	/**
+	 * Invokes the upload and run process.
+	 * 
+	 * @param main_class
+	 * @see LeJOSDistribution#invokeUploadAndRun(BClass)
+	 */
 	public void invokeUploadAndRun( BClass main_class ) {
 		try {
 			invokeLink(main_class);
 
 			runProcess(lejos.invokeUploadAndRun(main_class));
 		} catch( ProjectNotOpenException ex ) {
-			ui.getStatusPane().appendError(getLabel("exception.run", lejosVersion));
-			
+			ui.getStatusPane().appendError(
+					getLabel("exception.run", lejosVersion));
+
 			System.err.println(toString() + " Can't upload class: "
 					+ main_class.getName());
 			System.err.println(toString() + " " + ex.getMessage());
