@@ -13,6 +13,7 @@ pref.showCompile=Show compile option for classes
 pref.showLink=Show link option for classes
 pref.openEditor=Open class editor after compilation error
 pref.openDebug=Automatically open debug window
+pref.showOutput=Show output from linking process
 
 # Menu labels
 menu.class=%s

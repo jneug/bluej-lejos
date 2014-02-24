@@ -13,6 +13,7 @@ pref.showCompile=Kompilieren im Klassenmen\u00fc anzeigen
 pref.showLink=Verlinken im Klassenmen\u00fc anzeigen
 pref.openEditor=Klasseneditor bei Fehlern automatisch \u00f6ffnen
 pref.openDebug=Debug Fenster automatisch \u00f6ffnen
+pref.showOutput=Ausgabe des NXJ Uploads anzeigen
 
 # Menu labels
 menu.class=%s

@@ -25,7 +25,7 @@ public class LeJOSPreferencePanel extends JPanel {
 	public final JComboBox jcbVersion;
 
 	public final JCheckBox jcbShowCompile, jcbShowLink, jcbOpenEditor,
-			jcbOpenDebug;
+			jcbOpenDebug, jcbShowProcessOut;
 
 	public LeJOSPreferencePanel( BlueJ bluej ) {
 		JLabel jlNxjHome = new JLabel(bluej.getLabel("pref.lejos.home"));
@@ -76,6 +76,7 @@ public class LeJOSPreferencePanel extends JPanel {
 		this.jcbShowLink = new JCheckBox(bluej.getLabel("pref.showLink"));
 		this.jcbOpenEditor = new JCheckBox(bluej.getLabel("pref.openEditor"));
 		this.jcbOpenDebug = new JCheckBox(bluej.getLabel("pref.openDebug"));
+		this.jcbShowProcessOut = new JCheckBox(bluej.getLabel("pref.showOutput"));
 
 
 		// Layout the components
@@ -103,7 +104,8 @@ public class LeJOSPreferencePanel extends JPanel {
 								.addComponent(this.jcbShowCompile)
 								.addComponent(this.jcbShowLink)
 								.addComponent(this.jcbOpenEditor)
-								.addComponent(this.jcbOpenDebug))
+								.addComponent(this.jcbOpenDebug)
+								.addComponent(this.jcbShowProcessOut))
 						.addComponent(jbBrowse)
 						.addComponent(jbGetNxjHome)
 				);
@@ -125,6 +127,7 @@ public class LeJOSPreferencePanel extends JPanel {
 						.addComponent(this.jcbShowLink)
 						.addComponent(this.jcbOpenEditor)
 						.addComponent(this.jcbOpenDebug)
+						.addComponent(this.jcbShowProcessOut)
 				);
 	}
 

@@ -230,17 +230,19 @@ public class LeJOSExtension extends Extension {
 					});
 				}
 			});
-			process.addOutputListener(new InputStreamListener() {
-				@Override
-				public void nextLine( final String line ) {
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							pane.appendText(line);
-						}
-					});
-				}
-			});
+			if( this.preferences.show_output ) {
+				process.addOutputListener(new InputStreamListener() {
+					@Override
+					public void nextLine( final String line ) {
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								pane.appendText(line);
+							}
+						});
+					}
+				});
+			}
 			boolean success = process.start();
 
 			if( !success )
