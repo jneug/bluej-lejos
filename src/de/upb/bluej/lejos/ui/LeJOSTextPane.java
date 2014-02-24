@@ -89,7 +89,9 @@ public class LeJOSTextPane extends JTextPane {
 				while( running ) {
 					try {
 						appendText(in.nextLine(), style);
-					} catch( NoSuchElementException | IllegalStateException ex ) {
+					} catch( NoSuchElementException e ) {
+						running = false;
+					} catch( IllegalStateException ex ) {
 						running = false;
 					}
 				}

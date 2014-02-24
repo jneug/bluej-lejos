@@ -43,7 +43,9 @@ public class LeJOSClassTargetPainter implements ExtensionClassTargetPainter {
 			if( main != null ) {
 				g.drawImage(nxjIcon, 2, 2, null);
 			}
-		} catch( ProjectNotOpenException | ClassNotFoundException | PackageNotFoundException e ) {
+		} catch( ProjectNotOpenException e1 ) {
+		} catch( ClassNotFoundException e2 ) {
+		} catch( PackageNotFoundException e ) {
 		}
 	}
 
