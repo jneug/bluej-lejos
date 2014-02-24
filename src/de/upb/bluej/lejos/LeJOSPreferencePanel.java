@@ -22,7 +22,7 @@ public class LeJOSPreferencePanel extends JPanel {
 
 	public final JTextField jtfNxjHome;
 
-	public final JComboBox<LeJOSDistribution> jcbVersion;
+	public final JComboBox jcbVersion;
 
 	public final JCheckBox jcbShowCompile, jcbShowLink, jcbOpenEditor,
 			jcbOpenDebug;
@@ -68,7 +68,7 @@ public class LeJOSPreferencePanel extends JPanel {
 			jbGetNxjHome.setEnabled(false);
 
 		JLabel jlVersion = new JLabel(bluej.getLabel("pref.lejos.version"));
-		this.jcbVersion = new JComboBox<LeJOSDistribution>(
+		this.jcbVersion = new JComboBox(
 				LeJOSDistribution.getSupportedLeJOSVersions());
 		this.jcbVersion.setEditable(false);
 

@@ -1,7 +1,6 @@
 package de.upb.bluej.lejos;
 
 import java.io.File;
-import java.nio.file.Paths;
 
 import bluej.extensions.BClass;
 import bluej.extensions.BMethod;
@@ -52,7 +51,9 @@ public class LeJOSUtils {
 			BMethod main = clazz.getMethod("main",
 					new Class<?>[] { String[].class });
 			return (main != null);
-		} catch( ProjectNotOpenException | ClassNotFoundException e ) {
+		} catch( ProjectNotOpenException e1 ) {
+			return false;
+		} catch( ClassNotFoundException e2 ) {  
 			return false;
 		}
 	}
@@ -67,7 +68,8 @@ public class LeJOSUtils {
 						return bclass;
 				}
 			}
-		} catch( PackageNotFoundException | ProjectNotOpenException ex ) {
+		} catch( PackageNotFoundException e1 ) {
+		} catch( ProjectNotOpenException e2 ) {
 		}
 		return null;
 	}
@@ -100,12 +102,14 @@ public class LeJOSUtils {
 		String path = cmd;
 
 		java_home = System.getenv("JAVA_HOME");
-		if( java_home != null )
-			path = Paths.get(java_home, "bin", cmd).toString();
+		if( java_home != null ) {
+			path = java_home + File.separator + "bin" + File.separator + cmd;
+		}
 		
 		java_home = System.getenv("LEJOS_NXT_JAVA_HOME");
-		if( java_home != null )
-			path = Paths.get(java_home, "bin", cmd).toString();
+		if( java_home != null ) {
+			path = java_home + File.separator + "bin" + File.separator + cmd;
+		}
 
 //		java_home = System.getProperty("java.home");
 //		if( java_home != null )

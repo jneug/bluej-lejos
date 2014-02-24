@@ -104,7 +104,7 @@ public class LeJOSPreferences implements PreferenceGenerator {
 		panel.jtfNxjHome.setText(nxjHome.getAbsolutePath());
 
 		// Read and save leJOS version
-		LeJOSDistribution dist = panel.jcbVersion.getItemAt(panel.jcbVersion
+		LeJOSDistribution dist = (LeJOSDistribution) panel.jcbVersion.getItemAt(panel.jcbVersion
 				.getSelectedIndex());
 		if( dist == null ) {
 			dist = LeJOSDistribution.getLatestLeJOSVersion();

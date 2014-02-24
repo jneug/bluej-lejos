@@ -2,8 +2,6 @@ package de.upb.bluej.lejos;
 
 import java.io.File;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +48,7 @@ public class LeJOS09 extends LeJOSDistribution {
 
 	public File[] getNxtClasspathFiles() {
 		return new File[] {
-				directory.toPath().resolve(nxtclasspath[0]).toFile()
+				new File(this.directory, nxtclasspath[0])
 		};
 	}
 
@@ -61,16 +59,14 @@ public class LeJOS09 extends LeJOSDistribution {
 
 	@Override
 	public boolean isValid( File path ) {
-		Path p = path.toPath();
-
-		if( !Files.isDirectory(p) )
+		if( !path.isDirectory() )
 			return false;
 
-		if( !checkPaths(p, folders) )
+		if( !checkPaths(path, folders) )
 			return false;
-		if( !checkPaths(p, nxtclasspath) )
+		if( !checkPaths(path, nxtclasspath) )
 			return false;
-		if( !checkPaths(p, pcclasspath) )
+		if( !checkPaths(path, pcclasspath) )
 			return false;
 
 		return true;
@@ -84,12 +80,13 @@ public class LeJOS09 extends LeJOSDistribution {
 	 * @param paths
 	 * @return
 	 */
-	private boolean checkPaths( Path p, String[] paths ) {
+	private boolean checkPaths( File p, String[] paths ) {
 		for( String resolve: paths ) {
-			if( !Files.exists(p.resolve(resolve)) ) {
+			File f = new File(p, resolve);
+			if( !f.exists() ) {
 				System.out
 						.println("[leJOS " + getVersion()
-								+ "] missing dependency: " + p.resolve(resolve));
+								+ "] missing dependency: " + f.getAbsolutePath());
 				return false;
 			}
 		}
@@ -183,7 +180,10 @@ public class LeJOS09 extends LeJOSDistribution {
 		for( BClass bclass: classes ) {
 			try {
 				cmd.add(bclass.getJavaFile().getAbsolutePath());
-			} catch( ProjectNotOpenException | PackageNotFoundException e ) {
+			} catch( ProjectNotOpenException e1 ) {
+				System.out.println("[leJOS " + getVersion()
+						+ "] error compiling class: " + bclass.getName());
+			} catch( PackageNotFoundException e2 ) {
 				System.out.println("[leJOS " + getVersion()
 						+ "] error compiling class: " + bclass.getName());
 			}

@@ -3,3 +3,4 @@ bin
 .project
 build.xml
 *.jardesc
+org.eclipse.jdt.core.prefs
