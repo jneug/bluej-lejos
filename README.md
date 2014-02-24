@@ -37,6 +37,8 @@ Step-by-Step Guide
 ### Install Java
 To use BlueJ you need to install at least version 6 of the Java Development Kit (JDK).
 Download and install your package of choice from [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+leJOS requires a 32 bit Java installation to work properly. So make sure to install
+the x86 version of the JDK, even if you're running a 64 bit Operating System.
 
 Please pay attention to the sidebar on the
 [BlueJ website](http://bluej.org/download/download.html):
@@ -65,6 +67,10 @@ The windows installer will automatically set the `NXJ_HOME` environment variable
 to the installation folder. On other systems it is recommended to set it
 manually. See the documentation of your operating system or
 [here](http://www.google.com?q=How+to+set+environment+variables+on+UNIX) for instructions.
+
+If you're running multiple versions of Java (especially on a 64 bit OS, where you
+need to install a separate 32 bit version of Java to run leJOS on), you also should set
+the `LEJOS_NXT_JAVA_HOME` variable to the correct Java version.
 
 ### Install BlueJ.leJOS
 Download the [extension](jar/bluej-lejos.jar) from the *jar* folder of this repository.
@@ -138,7 +144,7 @@ Usage
 
 ### Running leJOS programs
 
-### Debuging leJOS programs
+### Debugging leJOS programs
 
 FAQ
 ===
