@@ -31,31 +31,37 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 
 	@Override
 	public JMenuItem getToolsMenuItem( BPackage aPackage ) {
-		JMenu jm = new JMenu(String.format(bluej.getLabel("menu.tools"),
-				ext.getName()));
-		jm.add(new JMenuItem(new LeJOSFlashAction()));
-		jm.add(new JMenuItem(new NewProjectAction()));
-		return jm;
-
-		// return new JMenuItem(new LeJOSFlashAction());
+		if( ext.getPreferences().show_tools ) {
+			JMenu jm = new JMenu(String.format(bluej.getLabel("menu.tools"),
+					ext.getName()));
+			jm.add(new JMenuItem(new LeJOSFlashAction()));
+			jm.add(new JMenuItem(new NewProjectAction()));
+			return jm;
+		} else {
+			// return new JMenuItem(new LeJOSFlashAction());
+			return null;
+		}
 	}
 
 	@Override
 	@SuppressWarnings("serial")
 	public JMenuItem getPackageMenuItem( final BPackage aPackage ) {
-		JMenu jm = new JMenu(String.format(bluej.getLabel("menu.pkg"),
-				ext.getName()));
-		jm.add(new JMenuItem(new LeJOSCompileAction()));
-		jm.add(new JMenuItem(new AbstractAction(bluej
-				.getLabel("menu.pkg.copyLib")) {
-			@Override
-			public void actionPerformed( ActionEvent anEvent ) {
-				ext.copyNXJLibraries();
-			}
-		}));
-		return jm;
+		if( ext.getPreferences().show_tools ) {
+			JMenu jm = new JMenu(String.format(bluej.getLabel("menu.pkg"),
+					ext.getName()));
+			jm.add(new JMenuItem(new LeJOSCompileAction()));
+			jm.add(new JMenuItem(new AbstractAction(bluej
+					.getLabel("menu.pkg.copyLib")) {
+				@Override
+				public void actionPerformed( ActionEvent anEvent ) {
+					ext.copyNXJLibraries();
+				}
+			}));
+			return jm;
+		} else {
+			return new JMenuItem(new LeJOSCompileAction());
+		}
 		
-		// return new JMenuItem(new LeJOSCompileAction());
 	}
 
 	@Override
