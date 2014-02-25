@@ -14,6 +14,8 @@ import bluej.extensions.Extension;
 import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 import bluej.extensions.editor.Editor;
+import bluej.pkgmgr.Project;
+import bluej.utility.FileUtility;
 import de.upb.bluej.lejos.LeJOSProcess.InputStreamListener;
 import de.upb.bluej.lejos.ui.LeJOSExtensionUI;
 import de.upb.bluej.lejos.ui.LeJOSTextPane;
@@ -34,6 +36,11 @@ public class LeJOSExtension extends Extension {
 	 * The current version string in the format {@code MAJOR.MINOR.DEV}
 	 */
 	public static final String VERSION = "0.2.2";
+	
+	/**
+	 * Folder for project specific libraries
+	 */
+	private static final String LIBS_DIR = "+libs";
 
 
 	private BlueJ bluej;
@@ -198,6 +205,57 @@ public class LeJOSExtension extends Extension {
 			return label;
 		else
 			return String.format(label, args);
+	}
+	
+	public boolean createNXJProject( File dir ) {
+		String pathString = dir.getAbsolutePath();
+        if (!pathString.endsWith(File.separator))
+            pathString += File.separator;
+        
+		if( Project.createNewProject(pathString, false) ) {
+			copyNXJLibraries(dir);
+			return bluej.openProject(dir) != null;
+		} else {
+			System.out.println(this.toString()
+					+ " failed to create new project in "
+					+ dir.toString());
+			return false;
+		}
+	}
+	
+	public boolean copyNXJLibraries() {
+		BProject project = null;
+		try {
+			project = bluej.getCurrentPackage().getProject();
+			return copyNXJLibraries(project.getDir());
+		} catch( ProjectNotOpenException e ) {
+			return false;
+		}
+	}
+	
+	public boolean copyNXJLibraries( File dest ) {
+		if( dest == null || !dest.isDirectory() )
+			return false;
+		
+		try {
+			File classes = getLejosVersion()
+					.getNxtClasspathFiles()[0];
+			
+			File newClasses = new File(dest, LIBS_DIR+File.separator+classes.getName());
+			if( !newClasses.getParentFile().exists() ) {
+				newClasses.getParentFile().mkdir();
+			}
+			
+			FileUtility.copyFile(classes, newClasses);
+			
+			return newClasses.exists();
+		} catch( Exception ex ) {
+			System.out.println(this.toString()
+					+ " failed to copy leJOS library to  "
+					+ dest.toString());
+			ex.printStackTrace();
+			return false;
+		}
 	}
 
 	/**

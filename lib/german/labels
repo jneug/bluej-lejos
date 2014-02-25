@@ -22,6 +22,8 @@ menu.class.link=Verlinken
 menu.class.upload=Auf NXT laden
 menu.class.run=Auf NXT starten
 
+menu.pkg=%s
+menu.pkg.copyLib=leJOS Bibliothek in Projekt kopieren
 menu.pkg.compile=Projekt mit leJOS kompilieren
 
 menu.tools.flash=NXT flashen

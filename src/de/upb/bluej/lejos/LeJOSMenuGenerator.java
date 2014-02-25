@@ -10,10 +10,8 @@ import javax.swing.JMenuItem;
 
 import bluej.extensions.BClass;
 import bluej.extensions.BPackage;
-import bluej.extensions.BProject;
 import bluej.extensions.BlueJ;
 import bluej.extensions.MenuGenerator;
-import bluej.utility.FileUtility;
 
 public class LeJOSMenuGenerator extends MenuGenerator {
 
@@ -32,54 +30,32 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 	}
 
 	@Override
-	@SuppressWarnings("serial")
 	public JMenuItem getToolsMenuItem( BPackage aPackage ) {
 		JMenu jm = new JMenu(String.format(bluej.getLabel("menu.tools"),
 				ext.getName()));
 		jm.add(new JMenuItem(new LeJOSFlashAction()));
-		jm.add(new JMenuItem(new AbstractAction(bluej
-				.getLabel("menu.tools.newProject")) {
-			public void actionPerformed( ActionEvent anEvent ) {
-				JFileChooser jfcBrowser = new JFileChooser();
-//				jfcBrowser.setAcceptAllFileFilterUsed(false);
-				jfcBrowser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-				int returnVal = jfcBrowser
-						.showOpenDialog(ext.getBlueJ().getCurrentFrame());
-				if( returnVal == JFileChooser.APPROVE_OPTION ) {
-					File dir = jfcBrowser.getSelectedFile();
-
-					BProject project = ext.getBlueJ().newProject(dir,
-							BlueJ.SE_PROJECT);
-					if( project != null ) {
-						try {
-							File libDir = new File(project.getDir(), "+lib");
-							libDir.mkdir();
-
-							File classes = ext.getLejosVersion()
-									.getNxtClasspathFiles()[0];
-							FileUtility.copyFile(classes, libDir);
-						} catch( Exception ex ) {
-							System.out.println(ext.toString()
-									+ " failed to copy leJOS files to  "
-									+ dir.toString());
-							ex.printStackTrace();
-						}
-					} else {
-						System.out.println(ext.toString()
-								+ " failed to create new project in "
-								+ dir.toString());
-					}
-				}
-			}
-		}));
+		jm.add(new JMenuItem(new NewProjectAction()));
 		return jm;
+
 		// return new JMenuItem(new LeJOSFlashAction());
 	}
 
 	@Override
-	public JMenuItem getPackageMenuItem( BPackage aPackage ) {
-		return new JMenuItem(new LeJOSCompileAction());
+	@SuppressWarnings("serial")
+	public JMenuItem getPackageMenuItem( final BPackage aPackage ) {
+		JMenu jm = new JMenu(String.format(bluej.getLabel("menu.pkg"),
+				ext.getName()));
+		jm.add(new JMenuItem(new LeJOSCompileAction()));
+		jm.add(new JMenuItem(new AbstractAction(bluej
+				.getLabel("menu.pkg.copyLib")) {
+			@Override
+			public void actionPerformed( ActionEvent anEvent ) {
+				ext.copyNXJLibraries();
+			}
+		}));
+		return jm;
+		
+		// return new JMenuItem(new LeJOSCompileAction());
 	}
 
 	@Override
@@ -158,6 +134,30 @@ public class LeJOSMenuGenerator extends MenuGenerator {
 
 		public void actionPerformed( ActionEvent anEvent ) {
 			ext.invokeCompile();
+		}
+	}
+
+	@SuppressWarnings("serial")
+	class NewProjectAction extends AbstractAction {
+		private JFileChooser jfcBrowser;
+		
+		public NewProjectAction() {
+			putValue(AbstractAction.NAME,
+					bluej.getLabel("menu.tools.newProject"));
+			
+			jfcBrowser = new JFileChooser();
+			jfcBrowser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
+			jfcBrowser.setDialogTitle(bluej.getLabel("menu.tools.newProject"));
+			jfcBrowser.setDialogType(JFileChooser.CUSTOM_DIALOG);
+		}
+
+		public void actionPerformed( ActionEvent anEvent ) {
+			int returnVal = jfcBrowser.showDialog(ext.getBlueJ().getCurrentFrame(), "Create");
+			if( returnVal == JFileChooser.APPROVE_OPTION ) {
+				File dir = jfcBrowser.getSelectedFile();
+				ext.createNXJProject(dir);
+			}
 		}
 	}
 

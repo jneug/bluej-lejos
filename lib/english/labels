@@ -22,6 +22,8 @@ menu.class.link=Link binary
 menu.class.upload=Upload to NXT
 menu.class.run=Upload and run
 
+menu.pkg=%s
+menu.pkg.copyLib=Copy leJOS library to project
 menu.pkg.compile=Compile project for NXT
 
 menu.tools=%s
