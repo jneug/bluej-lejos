@@ -24,7 +24,9 @@ menu.class.run=Upload and run
 
 menu.pkg.compile=Compile project for NXT
 
+menu.tools=%s
 menu.tools.flash=Flash NXT
+menu.tools.newProject=New NXJ project
 menu.view.showDebug=Show NXT debug 
 
 # Debug window
